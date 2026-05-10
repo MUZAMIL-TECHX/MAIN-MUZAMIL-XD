@@ -137,7 +137,7 @@
 <table align="center">
   <tr>
     <td align="center">
-      <a href="https://khanmd-vps.vercel.app" target="_blank">
+      <a href="https://muzamil-xd-freevps-4254d1c9c793.herokuapp.com/" target="_blank">
         <img alt="VPS Deploy" src="https://img.shields.io/badge/VPS_DEPLOY-Free_Unlimited-FF4500?style=for-the-badge&logo=serverless&logoColor=white&labelColor=0F0529"/>
       </a>
     </td>
