@@ -3,8 +3,6 @@ const axios = require('axios')
 const yts = require('yt-search')
 const fs = require('fs')
 const path = require('path')
-const ffmpeg = require('fluent-ffmpeg')
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
 
 cmd({
     pattern: "video",
@@ -20,104 +18,132 @@ async (conn, mek, m, { from, args, q, reply, react }) => {
             return reply(`🎥 *YouTube Video Downloader*
             
 📌 *Usage:* 
-.ytvideo <video name>
-.ytvideo <youtube url>
+.video <video name>
+.video <youtube url>
 
 ✨ *Example:* 
-.ytvideo Diljit Dosanjh G.O.A.T
-.ytvideo https://youtu.be/xyz123
+.video Diljit Dosanjh G.O.A.T
+.video https://youtu.be/xyz123
 
-⚡ *Quality:* 360p (Fast)
+⚡ *Quality:* Best Available
 💫 *Video will be sent directly!*`);
         }
 
         await react("⏳");
-        reply("🔄 *Searching video...*\n⏱️ Please wait 15-30 seconds");
+        reply("🔄 *Searching video...*\n⏱️ Please wait...");
 
         let videoUrl = q;
         let videoTitle = "";
         
-        // If not a URL, search first
+        // If not a URL, search first using yt-search
         if (!q.includes("youtube.com") && !q.includes("youtu.be")) {
-            const searchApi = `https://api.popcat.xyz/searchyt?q=${encodeURIComponent(q)}`;
-            const searchRes = await axios.get(searchApi);
-            
-            if (!searchRes.data || !searchRes.data[0]) {
+            const searchResults = await yts(q);
+            if (!searchResults || !searchResults.videos.length) {
                 await react("❌");
                 return reply("❌ *No video found!* Try different keywords.");
             }
             
-            videoUrl = searchRes.data[0].url;
-            videoTitle = searchRes.data[0].title;
+            const video = searchResults.videos[0];
+            videoUrl = video.url;
+            videoTitle = video.title;
             await reply(`🔍 *Found:* ${videoTitle.substring(0, 50)}...\n📥 *Processing download...*`);
         }
 
         await react("📥");
         
-        // API that returns direct video (not link)
-        const downloadApi = `https://api.ryzendesu.vip/api/download/ytmp4?url=${encodeURIComponent(videoUrl)}`;
-        const dlRes = await axios.get(downloadApi);
+        // Try multiple APIs (working ones)
+        let videoBuffer = null;
+        let finalTitle = videoTitle;
+        let errors = [];
         
-        if (!dlRes.data || !dlRes.data.download_url) {
-            throw new Error("Download link not found");
-        }
-
-        // Download video to buffer
-        const videoResponse = await axios.get(dlRes.data.download_url, {
-            responseType: 'arraybuffer'
-        });
-        
-        const videoBuffer = Buffer.from(videoResponse.data);
-        
-        // Send video directly (NO LINK SHOWN)
-        await conn.sendMessage(from, {
-            video: videoBuffer,
-            caption: `🎬 *${videoTitle || dlRes.data.title || "YouTube Video"}*
+        // API 1: TikMate (Working)
+        try {
+            const tikMateApi = `https://tikmate.online/api/youtube/download?url=${encodeURIComponent(videoUrl)}`;
+            const response = await axios.get(tikMateApi, { timeout: 30000 });
             
+            if (response.data && response.data.video_url) {
+                const videoRes = await axios.get(response.data.video_url, {
+                    responseType: 'arraybuffer',
+                    timeout: 60000
+                });
+                videoBuffer = Buffer.from(videoRes.data);
+                finalTitle = response.data.title || finalTitle;
+            }
+        } catch (e) {
+            errors.push("TikMate: " + e.message);
+        }
+        
+        // API 2: Y2Mate Alternative
+        if (!videoBuffer) {
+            try {
+                const y2mateApi = `https://y2mate.ch/api/youtube/mp4?url=${encodeURIComponent(videoUrl)}`;
+                const response = await axios.get(y2mateApi, { timeout: 30000 });
+                
+                if (response.data && response.data.download_url) {
+                    const videoRes = await axios.get(response.data.download_url, {
+                        responseType: 'arraybuffer',
+                        timeout: 60000
+                    });
+                    videoBuffer = Buffer.from(videoRes.data);
+                    finalTitle = response.data.title || finalTitle;
+                }
+            } catch (e) {
+                errors.push("Y2Mate: " + e.message);
+            }
+        }
+        
+        // API 3: SSYoutube Alternative
+        if (!videoBuffer) {
+            try {
+                const ssApi = `https://ssyoutube.com/api/convert?url=${encodeURIComponent(videoUrl)}&format=mp4`;
+                const response = await axios.get(ssApi, { timeout: 30000 });
+                
+                if (response.data && response.data.download_url) {
+                    const videoRes = await axios.get(response.data.download_url, {
+                        responseType: 'arraybuffer',
+                        timeout: 60000
+                    });
+                    videoBuffer = Buffer.from(videoRes.data);
+                    finalTitle = response.data.title || finalTitle;
+                }
+            } catch (e) {
+                errors.push("SSYouTube: " + e.message);
+            }
+        }
+        
+        // Send video if we have buffer
+        if (videoBuffer && videoBuffer.length > 0) {
+            await conn.sendMessage(from, {
+                video: videoBuffer,
+                caption: `🎬 *${finalTitle || "YouTube Video"}*
+                
 ✅ *Download Complete!*
-🎥 *Quality:* ${dlRes.data.quality || "360p"}
-📊 *Size:* ${dlRes.data.size || "Unknown"}
+📊 *Size:* ${(videoBuffer.length / (1024 * 1024)).toFixed(2)} MB
 👤 *Requested by:* ${m.pushName || "User"}
 
 💫 *MUZAMIL-XD*`,
-            mimetype: 'video/mp4'
-        }, { quoted: mek });
-        
-        await react("✅");
+                mimetype: 'video/mp4'
+            }, { quoted: mek });
+            
+            await react("✅");
+        } else {
+            throw new Error("All APIs failed: " + errors.join(", "));
+        }
         
     } catch (e) {
         console.error("YT Video Error:", e);
         await react("❌");
         
-        // Alternative API (y2mate)
-        try {
-            reply("🔄 *Trying alternative server...*");
-            
-            const y2mateApi = `https://y2mate.in/api/ajax/search?q=${encodeURIComponent(videoUrl || q)}`;
-            const y2mateRes = await axios.get(y2mateApi);
-            
-            if (y2mateRes.data && y2mateRes.data.video) {
-                const videoBuffer = await axios.get(y2mateRes.data.video[0].url, {
-                    responseType: 'arraybuffer'
-                });
-                
-                await conn.sendMessage(from, {
-                    video: Buffer.from(videoBuffer.data),
-                    caption: "🎬 *YouTube Video (Alt Server)*\n💫 MUZAMIL-XD",
-                    mimetype: 'video/mp4'
-                }, { quoted: mek });
-                await react("✅");
-                return;
-            }
-        } catch (fallbackErr) {}
-        
         reply(`❌ *Download Failed!*
         
-📌 *Try:*
-• Use exact video name
-• Try with YouTube URL directly
-• Video might be restricted
+📌 *Try These Solutions:*
+• Use exact video title
+• Try with direct YouTube URL
+• Video might be restricted/copyrighted
+• Try a shorter video (under 10 minutes)
 
-❌ *Error:* ${e.message}`);
+❌ *Error:* ${e.message}
+
+💡 *Tip:* Try command: .video <song name> (keep it short)`);
     }
 });
