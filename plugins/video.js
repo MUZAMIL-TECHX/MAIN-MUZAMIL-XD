@@ -1,18 +1,19 @@
 const axios = require("axios");
 const { cmd } = require('../command');
+const fs = require('fs');
+const path = require('path');
 
-// ================== YOUTUBE VIDEO DOWNLOADER (Same as IGDL) ==================
+// ================== YOUTUBE VIDEO DOWNLOADER (Direct Video Send) ==================
 cmd({
     pattern: "video",
     alias: ["ytv", "youtube", "ytvideo", "yt"],
     react: "📥",
-    desc: "Download YouTube videos (High Quality)",
+    desc: "Download YouTube videos (Direct Video Send)",
     category: "downloader",
     use: ".video <YouTube URL or search>",
     filename: __filename
 }, async (conn, mek, m, { from, reply, args, q }) => {
     try {
-        // Check if URL or search query provided
         let url = q || m.quoted?.text;
         if (!url) {
             return reply(`❌ *Please provide a YouTube link or video name*
@@ -29,12 +30,11 @@ cmd({
         }
 
         await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
-        reply("🔍 *Searching/Processing your video...*");
+        reply("🔍 *Processing your video...*");
 
         // Convert search query to URL if needed
         let videoUrl = url;
         if (!url.includes("youtube.com") && !url.includes("youtu.be")) {
-            // Using yt-search API to convert name to URL
             const searchApi = `https://api.siputzx.my.id/api/ytsearch?query=${encodeURIComponent(url)}`;
             const search = await axios.get(searchApi);
             
@@ -47,56 +47,110 @@ cmd({
             reply(`✅ *Found:* ${search.data.data.videos[0].title.substring(0, 50)}...\n📥 *Downloading now...*`);
         }
 
-        // MAIN API - Same style as IGDL (Working API)
-        const apiUrl = `https://api.siputzx.my.id/api/ytdl?url=${encodeURIComponent(videoUrl)}`;
-        const response = await axios.get(apiUrl);
+        // ========== GET DOWNLOAD URL FROM API ==========
+        let downloadUrl = null;
+        let videoTitle = null;
+        
+        try {
+            const apiUrl = `https://eliteprotech-apis.zone.id/ytdown?url=${encodeURIComponent(videoUrl)}`;
+            console.log("Calling API:", apiUrl);
+            
+            const response = await axios.get(apiUrl, { timeout: 20000 });
+            console.log("API Response:", JSON.stringify(response.data, null, 2));
 
-        if (!response.data?.status || !response.data?.data) {
+            if (response.data?.success === true) {
+                downloadUrl = response.data.downloadURL;  // Yahaan downloadURL hai
+                videoTitle = response.data.title;
+                console.log("Download URL:", downloadUrl);
+            } else {
+                throw new Error("API response invalid");
+            }
+            
+        } catch (err) {
+            console.error("API Error:", err.message);
             await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
-            return reply("❌ *Failed to fetch video. Link might be invalid or restricted.*");
+            return reply(`❌ *API Error:* ${err.message}\n\nTry again later.`);
         }
 
-        const videoData = response.data.data;
-        
-        // Get video URL (mp4 format)
-        let videoLink = videoData.video || videoData.dl || videoData.url;
-        
-        if (!videoLink) {
-            return reply("❌ *Download link not available. Try another video.*");
+        if (!downloadUrl) {
+            await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+            return reply("❌ *Download link not found!*");
         }
 
-        // Create caption like Instagram downloader
+        // ========== DOWNLOAD VIDEO FROM DOWNLOAD URL ==========
+        reply("📥 *Downloading video from server...*\n⏱️ *Please wait (5MB video taking time)*");
+
+        const videoPath = path.join(__dirname, '../temp', `vid_${Date.now()}.mp4`);
+        
+        // Ensure temp directory exists
+        if (!fs.existsSync(path.join(__dirname, '../temp'))) {
+            fs.mkdirSync(path.join(__dirname, '../temp'), { recursive: true });
+        }
+
+        // Download video file
+        const writer = fs.createWriteStream(videoPath);
+        const videoResponse = await axios({
+            method: 'get',
+            url: downloadUrl,
+            responseType: 'stream',
+            timeout: 60000  // 60 seconds timeout for 5MB video
+        });
+
+        videoResponse.data.pipe(writer);
+
+        await new Promise((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', reject);
+        });
+
+        const videoStats = fs.statSync(videoPath);
+        const videoSizeMB = (videoStats.size / (1024 * 1024)).toFixed(2);
+        
+        console.log(`Video downloaded: ${videoSizeMB} MB`);
+
+        // ========== SEND DIRECT VIDEO TO WHATSAPP ==========
         const caption = 
 `╭─────────────────⭓
 │  📥 *YOUTUBE VIDEO DOWNLOADER*
 ├─────────────────
-│  ✦ *Title:* ${videoData.title || "YouTube Video"}
-│  ✦ *Duration:* ${videoData.duration || "Unknown"}
-│  ✦ *Quality:* ${videoData.quality || "HD"}
+│  ✦ *Title:* ${videoTitle || "YouTube Video"}
+│  ✦ *Size:* ${videoSizeMB} MB
+│  ✦ *Quality:* HD
+│  ✦ *API:* EliteProtech ⚡
 │  ✦ *Downloaded by:* *MUZAMIL KHAN*
 ├─────────────────
 │  *𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 Μʋʓαмιℓ-ƵƉ*
 ╰─────────────────⭓`;
 
-        // Send video directly
+        // ✅ DIRECT VIDEO BHEJ RAHA HAIN (SIRF LINK NAHI)
         await conn.sendMessage(from, {
-            video: { url: videoLink },
+            video: { url: videoPath },  // Local file path se video bhejega
             caption: caption,
             mimetype: 'video/mp4'
         }, { quoted: mek });
 
+        // Cleanup - delete temp file
+        fs.unlinkSync(videoPath);
+        
         await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
+        reply(`✅ *Video sent successfully!*\n📊 *Size:* ${videoSizeMB} MB`);
 
     } catch (error) {
         console.error('YouTube Video Error:', error);
         await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
-        reply(`❌ *Download failed!*
-
-📌 *Try this:*
-• Use direct YouTube URL
-• Check if video is public
-• Try a different video
-
-💡 *Example:* .video https://youtu.be/VIDEO_ID`);
+        reply(`❌ *Download failed!*\n\nError: ${error.message}\n\n💡 Try again or use different video.`);
+        
+        // Cleanup on error
+        try {
+            const tempDir = path.join(__dirname, '../temp');
+            if (fs.existsSync(tempDir)) {
+                const files = fs.readdirSync(tempDir);
+                files.forEach(file => {
+                    if (file.startsWith('vid_')) {
+                        fs.unlinkSync(path.join(tempDir, file));
+                    }
+                });
+            }
+        } catch(e) {}
     }
 });
