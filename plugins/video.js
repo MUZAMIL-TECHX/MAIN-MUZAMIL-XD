@@ -1,149 +1,102 @@
-const { cmd } = require('../command')
-const axios = require('axios')
-const yts = require('yt-search')
-const fs = require('fs')
-const path = require('path')
+const axios = require("axios");
+const { cmd } = require('../command');
 
+// ================== YOUTUBE VIDEO DOWNLOADER (Same as IGDL) ==================
 cmd({
     pattern: "video",
-    alias: ["ytv", "youtubevideo", "ytdl"],
-    desc: "Download and send YouTube video directly",
-    category: "downloader",
+    alias: ["ytv", "youtube", "ytvideo", "yt"],
     react: "📥",
+    desc: "Download YouTube videos (High Quality)",
+    category: "downloader",
+    use: ".video <YouTube URL or search>",
     filename: __filename
-},
-async (conn, mek, m, { from, args, q, reply, react }) => {
+}, async (conn, mek, m, { from, reply, args, q }) => {
     try {
-        if (!q) {
-            return reply(`🎥 *YouTube Video Downloader*
-            
+        // Check if URL or search query provided
+        let url = q || m.quoted?.text;
+        if (!url) {
+            return reply(`❌ *Please provide a YouTube link or video name*
+
 📌 *Usage:* 
+.video <YouTube URL>
 .video <video name>
-.video <youtube url>
 
-✨ *Example:* 
+✨ *Examples:* 
+.video https://youtu.be/abc123
 .video Diljit Dosanjh G.O.A.T
-.video https://youtu.be/xyz123
 
-⚡ *Quality:* Best Available
-💫 *Video will be sent directly!*`);
+⚡ *Powered by MUZAMIL-XD*`);
         }
 
-        await react("⏳");
-        reply("🔄 *Searching video...*\n⏱️ Please wait...");
+        await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
+        reply("🔍 *Searching/Processing your video...*");
 
-        let videoUrl = q;
-        let videoTitle = "";
-        
-        // If not a URL, search first using yt-search
-        if (!q.includes("youtube.com") && !q.includes("youtu.be")) {
-            const searchResults = await yts(q);
-            if (!searchResults || !searchResults.videos.length) {
-                await react("❌");
-                return reply("❌ *No video found!* Try different keywords.");
+        // Convert search query to URL if needed
+        let videoUrl = url;
+        if (!url.includes("youtube.com") && !url.includes("youtu.be")) {
+            // Using yt-search API to convert name to URL
+            const searchApi = `https://api.siputzx.my.id/api/ytsearch?query=${encodeURIComponent(url)}`;
+            const search = await axios.get(searchApi);
+            
+            if (!search.data?.status || !search.data?.data?.videos?.length) {
+                await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+                return reply("❌ *No video found! Try different keywords.*");
             }
             
-            const video = searchResults.videos[0];
-            videoUrl = video.url;
-            videoTitle = video.title;
-            await reply(`🔍 *Found:* ${videoTitle.substring(0, 50)}...\n📥 *Processing download...*`);
+            videoUrl = search.data.data.videos[0].url;
+            reply(`✅ *Found:* ${search.data.data.videos[0].title.substring(0, 50)}...\n📥 *Downloading now...*`);
         }
 
-        await react("📥");
-        
-        // Try multiple APIs (working ones)
-        let videoBuffer = null;
-        let finalTitle = videoTitle;
-        let errors = [];
-        
-        // API 1: TikMate (Working)
-        try {
-            const tikMateApi = `https://tikmate.online/api/youtube/download?url=${encodeURIComponent(videoUrl)}`;
-            const response = await axios.get(tikMateApi, { timeout: 30000 });
-            
-            if (response.data && response.data.video_url) {
-                const videoRes = await axios.get(response.data.video_url, {
-                    responseType: 'arraybuffer',
-                    timeout: 60000
-                });
-                videoBuffer = Buffer.from(videoRes.data);
-                finalTitle = response.data.title || finalTitle;
-            }
-        } catch (e) {
-            errors.push("TikMate: " + e.message);
-        }
-        
-        // API 2: Y2Mate Alternative
-        if (!videoBuffer) {
-            try {
-                const y2mateApi = `https://y2mate.ch/api/youtube/mp4?url=${encodeURIComponent(videoUrl)}`;
-                const response = await axios.get(y2mateApi, { timeout: 30000 });
-                
-                if (response.data && response.data.download_url) {
-                    const videoRes = await axios.get(response.data.download_url, {
-                        responseType: 'arraybuffer',
-                        timeout: 60000
-                    });
-                    videoBuffer = Buffer.from(videoRes.data);
-                    finalTitle = response.data.title || finalTitle;
-                }
-            } catch (e) {
-                errors.push("Y2Mate: " + e.message);
-            }
-        }
-        
-        // API 3: SSYoutube Alternative
-        if (!videoBuffer) {
-            try {
-                const ssApi = `https://ssyoutube.com/api/convert?url=${encodeURIComponent(videoUrl)}&format=mp4`;
-                const response = await axios.get(ssApi, { timeout: 30000 });
-                
-                if (response.data && response.data.download_url) {
-                    const videoRes = await axios.get(response.data.download_url, {
-                        responseType: 'arraybuffer',
-                        timeout: 60000
-                    });
-                    videoBuffer = Buffer.from(videoRes.data);
-                    finalTitle = response.data.title || finalTitle;
-                }
-            } catch (e) {
-                errors.push("SSYouTube: " + e.message);
-            }
-        }
-        
-        // Send video if we have buffer
-        if (videoBuffer && videoBuffer.length > 0) {
-            await conn.sendMessage(from, {
-                video: videoBuffer,
-                caption: `🎬 *${finalTitle || "YouTube Video"}*
-                
-✅ *Download Complete!*
-📊 *Size:* ${(videoBuffer.length / (1024 * 1024)).toFixed(2)} MB
-👤 *Requested by:* ${m.pushName || "User"}
+        // MAIN API - Same style as IGDL (Working API)
+        const apiUrl = `https://api.siputzx.my.id/api/ytdl?url=${encodeURIComponent(videoUrl)}`;
+        const response = await axios.get(apiUrl);
 
-💫 *MUZAMIL-XD*`,
-                mimetype: 'video/mp4'
-            }, { quoted: mek });
-            
-            await react("✅");
-        } else {
-            throw new Error("All APIs failed: " + errors.join(", "));
+        if (!response.data?.status || !response.data?.data) {
+            await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+            return reply("❌ *Failed to fetch video. Link might be invalid or restricted.*");
         }
-        
-    } catch (e) {
-        console.error("YT Video Error:", e);
-        await react("❌");
-        
-        reply(`❌ *Download Failed!*
-        
-📌 *Try These Solutions:*
-• Use exact video title
-• Try with direct YouTube URL
-• Video might be restricted/copyrighted
-• Try a shorter video (under 10 minutes)
 
-❌ *Error:* ${e.message}
+        const videoData = response.data.data;
+        
+        // Get video URL (mp4 format)
+        let videoLink = videoData.video || videoData.dl || videoData.url;
+        
+        if (!videoLink) {
+            return reply("❌ *Download link not available. Try another video.*");
+        }
 
-💡 *Tip:* Try command: .video <song name> (keep it short)`);
+        // Create caption like Instagram downloader
+        const caption = 
+`╭─────────────────⭓
+│  📥 *YOUTUBE VIDEO DOWNLOADER*
+├─────────────────
+│  ✦ *Title:* ${videoData.title || "YouTube Video"}
+│  ✦ *Duration:* ${videoData.duration || "Unknown"}
+│  ✦ *Quality:* ${videoData.quality || "HD"}
+│  ✦ *Downloaded by:* *MUZAMIL KHAN*
+├─────────────────
+│  *𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 Μʋʓαмιℓ-ƵƉ*
+╰─────────────────⭓`;
+
+        // Send video directly
+        await conn.sendMessage(from, {
+            video: { url: videoLink },
+            caption: caption,
+            mimetype: 'video/mp4'
+        }, { quoted: mek });
+
+        await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
+
+    } catch (error) {
+        console.error('YouTube Video Error:', error);
+        await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+        reply(`❌ *Download failed!*
+
+📌 *Try this:*
+• Use direct YouTube URL
+• Check if video is public
+• Try a different video
+
+💡 *Example:* .video https://youtu.be/VIDEO_ID`);
     }
 });
