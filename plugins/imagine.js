@@ -4,7 +4,7 @@ const fs = require("fs");
 
 cmd({
   pattern: "createimg",
-  alias: ["nanobanana", "imagine", "searchimg", "pinterest"],
+  alias: ["nanobanana", "imagine", "searchimg", "img"],
   react: "🖼️",
   desc: "Search real images from Pinterest",
   category: "main",
