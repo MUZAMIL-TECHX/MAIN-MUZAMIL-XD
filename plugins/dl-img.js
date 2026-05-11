@@ -18,7 +18,7 @@ cmd({
 
         await reply(`🔍 Searching images for "${query}"...`);
 
-        const url = `https://apis.davidcyriltech.my.id/googleimage?query=${encodeURIComponent(query)}`;
+        const url = `https://allstars-apis.vercel.app/pinterest?search=${encodeURIComponent(q)}`;
         const response = await axios.get(url);
 
         // Validate response
@@ -37,7 +37,7 @@ cmd({
                 from,
                 { 
                     image: { url: imageUrl },
-                    caption: `📷 Result for: ${query}\n> © 𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 MUZAMIL KHAN`
+                    caption: `📷 Result for: ${query}\n> © 𝙋𝙊𝙒𝙀𝙍𝙀𝘿 𝘽𝙔 𝙈𝙐𝙕𝘼𝙈𝙄𝙇`
                 },
                 { quoted: mek }
             );

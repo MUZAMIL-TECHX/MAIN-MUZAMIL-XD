@@ -119,8 +119,8 @@ ${config.DESCRIPTION}`;
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363424789897971@newsletter',
-                    newsletterName: config.OWNER_NAME || 'ZORAIB-MD',
+                    newsletterJid: '120363426106687970@newsletter',
+                    newsletterName: config.OWNER_NAME || 'MUZAMIL-XD',
                     serverMessageId: 143
                 }
             }

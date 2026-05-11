@@ -254,7 +254,7 @@ cmd({
 ┃ 📅 *Updated On:* ${app.updated}
 ┃ 👨‍💻 *Developer:* ${app.developer.name}
 ╰━━━━━━━━━━━━━━━┈⊷
-🔗 **© 𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 MUZAMIL KHAN ❣️*`;
+🔗 **© 𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 мʋʓαмιℓ κнαи. ❣️*`;
 
     await conn.sendMessage(from, { react: { text: "⬆️", key: m.key } });
 
@@ -305,7 +305,7 @@ cmd({
         document: { url: downloadUrl },
         mimetype: response.data.result.mimetype,
         fileName: response.data.result.fileName,
-        caption: "*© 𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 MUZAMIL KHAN*"
+        caption: "*© 𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 мʋʓαмιℓ κнα.*"
       }, { quoted: m });
 
       await conn.sendMessage(from, { react: { text: "✅", key: m.key } });
