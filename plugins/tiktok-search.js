@@ -2,8 +2,8 @@ const fetch = require("node-fetch");
 const { cmd } = require("../command");
 
 cmd({
-  pattern: "tiktoksearch",
-  alias: ["tiktoks", "tiks"],
+  pattern: "short",
+  alias: ["reels", "shortvideo"],
   desc: "Search for TikTok videos using a query.",
   react: '✅',
   category: 'tools',
@@ -14,7 +14,7 @@ cmd({
   reply
 }) => {
   if (!args[0]) {
-    return reply("🌸 What do you want to search on TikTok?\n\n*Usage Example:*\n.tiktoksearch <query>");
+    return reply("🌸 What do you want to search on muzamil-XD?\n\n*Usage Example:*\n.tiktoksearch <query>");
   }
 
   const query = args.join(" ");
@@ -35,7 +35,7 @@ cmd({
     const results = data.data.slice(0, 7).sort(() => Math.random() - 0.5);
 
     for (const video of results) {
-      const message = `🌸 *TikTok Video Result*:\n\n`
+      const message = `🌸 *Muzamil-XD Video Result*:\n\n`
         + `*• Title*: ${video.title}\n`
         + `*• Author*: ${video.author || 'Unknown'}\n`
         + `*• Duration*: ${video.duration || "Unknown"}\n`
