@@ -179,10 +179,9 @@ const activeGames = new Map(); // Store active game sessions
 cmd({
   pattern: "playboomgame",
   desc: "💥 Start a 2-player Boom Game - Challenge someone!",
-  react: "💥",
   category: "fun",
   filename: __filename
-}, async (conn, m, store, { reply, sender, pushName, react }) => {
+}, async (conn, m, store, { reply, sender, pushName }) => {
   try {
     const groupId = m.key.remoteJid;
     
@@ -191,14 +190,12 @@ cmd({
       return reply("❌ *A game is already active in this group!*\n\nLet that game finish first 🎮");
     }
     
-    await react("🎲");
-    
     // Create game session
     const gameData = {
       host: sender,
       hostName: pushName || sender.split('@')[0],
       players: [],
-      status: 'waiting', // waiting, playing, finished
+      status: 'waiting',
       currentTurn: null,
       boxes: [],
       bombPosition: null,
@@ -217,7 +214,7 @@ cmd({
     teks += `│  📢 *REQUIREMENT* │\n`;
     teks += `│  Need 2 players  │\n`;
     teks += `└─────────────────┘\n\n`;
-    teks += `✨ *Reply* *.join* ✨\n`;
+    teks += `✨ *Type* *.join* ✨\n`;
     teks += `to participate in the game!\n\n`;
     teks += `⏱️ *Wait Time:* 60 seconds\n\n`;
     teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
@@ -247,12 +244,11 @@ cmd({
 
 // ========== JOIN COMMAND ==========
 cmd({
-  pattern: "join",
+  pattern: "enter",
   desc: "🎮 Join a Boom Game",
-  react: "🎮",
   category: "fun",
   filename: __filename
-}, async (conn, m, store, { reply, sender, pushName, react }) => {
+}, async (conn, m, store, { reply, sender, pushName }) => {
   try {
     const groupId = m.key.remoteJid;
     const game = activeGames.get(groupId);
@@ -280,8 +276,6 @@ cmd({
       score: 0
     });
     
-    await react("✅");
-    
     // Update game message
     let teks = `💥 *ＢＯＯＭ ＧＡＭＥ* 💥\n\n`;
     teks += `🎮 *Host:* @${game.host.split('@')[0]}\n`;
@@ -298,15 +292,14 @@ cmd({
       teks += `│  Starting soon... │\n`;
       teks += `━━━━━━━━━━━━━━━━━━\n\n`;
       teks += `⏱️ *Game will start in 5 seconds*\n`;
+      teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
       
       await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [game.host, sender] });
       
-      // Clear join timeout and start game
       clearTimeout(game.joinTimeout);
       setTimeout(() => startGame(conn, groupId, reply), 5000);
     } else {
       teks += `⏱️ *Waiting for 1 more player...*\n`;
-      teks += `⏰ *Time left:* ${Math.ceil((60000 - (Date.now() - game.joinTimeout._idleStart)) / 1000)}s\n\n`;
       teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
       
       await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [game.host, sender] });
@@ -376,7 +369,7 @@ async function updateGameMessage(conn, groupId, game) {
   teks += `│  📦 *BOXES* 📦    │\n`;
   teks += `└─────────────────┘\n\n`;
   
-  // Show boxes (opened vs hidden)
+  // Show boxes
   teks += `╔═══════════════════╗\n`;
   for (let i = 0; i < game.boxes.length; i += 3) {
     let row = '║  ';
@@ -428,7 +421,6 @@ function startTurnTimer(conn, groupId, game) {
     const remaining = 40 - elapsed;
     
     if (remaining <= 0) {
-      // Time out - current player loses
       clearInterval(currentGame.timerInterval);
       
       const loser = currentGame.currentTurn;
@@ -450,23 +442,17 @@ function startTurnTimer(conn, groupId, game) {
       
       await conn.sendMessage(groupId, { text: teks, edit: currentGame.msgKey, mentions: [loser, winner.id] });
       activeGames.delete(groupId);
-    } else if (remaining <= 10) {
-      // Update message with remaining time (only update every 5 seconds to avoid spam)
-      if (remaining === 10 || remaining === 5 || remaining === 3 || remaining === 2 || remaining === 1) {
-        await updateGameMessage(conn, groupId, currentGame);
-      }
     }
   }, 1000);
 }
 
 // ========== HANDLE NUMBER SELECTION ==========
-// Add this to your message handler or create a separate command
 cmd({
-  pattern: "\\d+",
+  pattern: "^[1-9]$",
   desc: "Select a box in Boom Game",
   category: "fun",
   filename: __filename
-}, async (conn, m, store, { reply, sender, react }) => {
+}, async (conn, m, store, { reply, sender }) => {
   try {
     const groupId = m.key.remoteJid;
     const game = activeGames.get(groupId);
@@ -480,16 +466,13 @@ cmd({
     const box = game.boxes[number - 1];
     
     if (box.isOpened) {
-      await react("⚠️");
       return reply(`❌ *Box ${number} is already opened!*\n\nChoose another box 🔄`);
     }
     
-    // Open the box
     box.isOpened = true;
     box.openedBy = sender;
     
     if (box.isBomb) {
-      // BOOM! Current player loses
       clearInterval(game.timerInterval);
       
       const loser = sender;
@@ -507,35 +490,16 @@ cmd({
       teks += `━━━━━━━━━━━━━━━━━━\n\n`;
       teks += `🎉 *WINNER:* @${winner.id.split('@')[0]} 🎉\n`;
       teks += `💀 *LOSER:* @${loser.split('@')[0]} 💀\n\n`;
-      
-      teks += `╔═══════════════════╗\n`;
-      for (let i = 0; i < game.boxes.length; i += 3) {
-        let row = '║  ';
-        for (let j = 0; j < 3; j++) {
-          const b = game.boxes[i + j];
-          row += b.isBomb ? '💥' : (b.isOpened ? '✅' : b.emoji);
-          row += '  ';
-        }
-        teks += row + '║\n';
-      }
-      teks += `╚═══════════════════╝\n\n`;
-      
       teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
       
       await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [loser, winner.id] });
       activeGames.delete(groupId);
-      await react("💥");
       
     } else {
-      // Safe box - continue game
-      await react("✅");
-      
-      // Check if all safe boxes are opened (means other player already opened some)
       const safeBoxes = game.boxes.filter(b => !b.isBomb);
       const openedSafeBoxes = safeBoxes.filter(b => b.isOpened);
       
       if (openedSafeBoxes.length === safeBoxes.length) {
-        // All safe boxes opened - current player wins!
         clearInterval(game.timerInterval);
         
         const winner = sender;
@@ -549,18 +513,6 @@ cmd({
         teks += `@${winner.split('@')[0]} opened the last safe box!\n`;
         teks += `🏆 *WINNER:* @${winner.split('@')[0]} 🏆\n`;
         teks += `💀 *LOSER:* @${loser.split('@')[0]} 💀\n\n`;
-        
-        teks += `╔═══════════════════╗\n`;
-        for (let i = 0; i < game.boxes.length; i += 3) {
-          let row = '║  ';
-          for (let j = 0; j < 3; j++) {
-            const b = game.boxes[i + j];
-            row += b.isBomb ? '💥' : '✅';
-            row += '  ';
-          }
-          teks += row + '║\n';
-        }
-        teks += `╚═══════════════════╝\n\n`;
         teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
         
         await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [winner, loser] });
@@ -568,7 +520,6 @@ cmd({
         return;
       }
       
-      // Switch turn to other player
       const otherPlayer = game.players.find(p => p.id !== sender);
       game.currentTurn = otherPlayer.id;
       game.turnStartTime = Date.now();
