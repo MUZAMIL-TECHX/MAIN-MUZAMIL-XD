@@ -6,115 +6,118 @@ const path = require('path')
 const ffmpeg = require('fluent-ffmpeg')
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
 
-ffmpeg.setFfmpegPath(ffmpegPath)
-
 cmd({
     pattern: "video",
-    alias: ["playvideo", "vid"],
-    desc: "Download YouTube video",
-    category: "download",
-    react: "🎬",
+    alias: ["ytv", "youtubevideo", "ytdl"],
+    desc: "Download and send YouTube video directly",
+    category: "downloader",
+    react: "📥",
     filename: __filename
-}, async (conn, mek, m, { from, reply, text }) => {
+},
+async (conn, mek, m, { from, args, q, reply, react }) => {
     try {
-        if (!text) {
-            return reply("❌ *Video name likho*\nExample:\n.video phir chala")
+        if (!q) {
+            return reply(`🎥 *YouTube Video Downloader*
+            
+📌 *Usage:* 
+.ytvideo <video name>
+.ytvideo <youtube url>
+
+✨ *Example:* 
+.ytvideo Diljit Dosanjh G.O.A.T
+.ytvideo https://youtu.be/xyz123
+
+⚡ *Quality:* 360p (Fast)
+💫 *Video will be sent directly!*`);
         }
 
-        // 🔍 Search video
-        const search = await yts(text)
-        if (!search.videos || !search.videos.length) {
-            return reply("❌ *No video found*")
+        await react("⏳");
+        reply("🔄 *Searching video...*\n⏱️ Please wait 15-30 seconds");
+
+        let videoUrl = q;
+        let videoTitle = "";
+        
+        // If not a URL, search first
+        if (!q.includes("youtube.com") && !q.includes("youtu.be")) {
+            const searchApi = `https://api.popcat.xyz/searchyt?q=${encodeURIComponent(q)}`;
+            const searchRes = await axios.get(searchApi);
+            
+            if (!searchRes.data || !searchRes.data[0]) {
+                await react("❌");
+                return reply("❌ *No video found!* Try different keywords.");
+            }
+            
+            videoUrl = searchRes.data[0].url;
+            videoTitle = searchRes.data[0].title;
+            await reply(`🔍 *Found:* ${videoTitle.substring(0, 50)}...\n📥 *Processing download...*`);
         }
 
-        const vid = search.videos[0]
+        await react("📥");
+        
+        // API that returns direct video (not link)
+        const downloadApi = `https://api.ryzendesu.vip/api/download/ytmp4?url=${encodeURIComponent(videoUrl)}`;
+        const dlRes = await axios.get(downloadApi);
+        
+        if (!dlRes.data || !dlRes.data.download_url) {
+            throw new Error("Download link not found");
+        }
 
-        // 🎨 STYLE MESSAGE (same as screenshot)
-        const caption = `
->*ᴢᴏʀᴀɪʙ ᴍᴅ*
-  ────────────────────
-  🎬 *VIDEO FOUND*
-
-  📌 *Title:* ${vid.title}
-  ⏱️ *Duration:* ${vid.timestamp}
-
-  ⏳ *Processing video...*
- ────────────────────
-> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ мʋʓαмιℓ*
-`
-
+        // Download video to buffer
+        const videoResponse = await axios.get(dlRes.data.download_url, {
+            responseType: 'arraybuffer'
+        });
+        
+        const videoBuffer = Buffer.from(videoResponse.data);
+        
+        // Send video directly (NO LINK SHOWN)
         await conn.sendMessage(from, {
-            image: { url: vid.thumbnail },
-            caption
-        }, { quoted: mek })
+            video: videoBuffer,
+            caption: `🎬 *${videoTitle || dlRes.data.title || "YouTube Video"}*
+            
+✅ *Download Complete!*
+🎥 *Quality:* ${dlRes.data.quality || "360p"}
+📊 *Size:* ${dlRes.data.size || "Unknown"}
+👤 *Requested by:* ${m.pushName || "User"}
 
-        // 🎥 API (Arslan)
-        const api = `https://arslan-apis.vercel.app/download/ytmp4?url=${encodeURIComponent(vid.url)}`
-        const res = await axios.get(api, { timeout: 60000 })
+💫 *MUZAMIL-XD*`,
+            mimetype: 'video/mp4'
+        }, { quoted: mek });
+        
+        await react("✅");
+        
+    } catch (e) {
+        console.error("YT Video Error:", e);
+        await react("❌");
+        
+        // Alternative API (y2mate)
+        try {
+            reply("🔄 *Trying alternative server...*");
+            
+            const y2mateApi = `https://y2mate.in/api/ajax/search?q=${encodeURIComponent(videoUrl || q)}`;
+            const y2mateRes = await axios.get(y2mateApi);
+            
+            if (y2mateRes.data && y2mateRes.data.video) {
+                const videoBuffer = await axios.get(y2mateRes.data.video[0].url, {
+                    responseType: 'arraybuffer'
+                });
+                
+                await conn.sendMessage(from, {
+                    video: Buffer.from(videoBuffer.data),
+                    caption: "🎬 *YouTube Video (Alt Server)*\n💫 MUZAMIL-XD",
+                    mimetype: 'video/mp4'
+                }, { quoted: mek });
+                await react("✅");
+                return;
+            }
+        } catch (fallbackErr) {}
+        
+        reply(`❌ *Download Failed!*
+        
+📌 *Try:*
+• Use exact video name
+• Try with YouTube URL directly
+• Video might be restricted
 
-        if (!res.data?.status || !res.data?.result?.download?.url) {
-            return reply("❌ *Video API failed*")
-        }
-
-        const videoUrl = res.data.result.download.url
-
-        // 📂 temp
-        const tempDir = path.join(__dirname, '../temp')
-        if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir)
-
-        const rawPath = path.join(tempDir, `raw_${Date.now()}.mp4`)
-        const finalPath = path.join(tempDir, `final_${Date.now()}.mp4`)
-
-        // ⬇ Download video
-        const stream = await axios({
-            url: videoUrl,
-            method: "GET",
-            responseType: "stream",
-            timeout: 120000
-        })
-
-        await new Promise((resolve, reject) => {
-            const w = fs.createWriteStream(rawPath)
-            stream.data.pipe(w)
-            w.on('finish', resolve)
-            w.on('error', reject)
-        })
-
-        // 🛠️ FFMPEG FIX (BLACK SCREEN SOLUTION)
-        await new Promise((resolve, reject) => {
-            ffmpeg(rawPath)
-                .outputOptions([
-                    '-map 0:v:0',
-                    '-map 0:a:0?',
-                    '-movflags +faststart',
-                    '-pix_fmt yuv420p',
-                    '-vf scale=trunc(iw/2)*2:trunc(ih/2)*2',
-                    '-profile:v baseline',
-                    '-level 3.0'
-                ])
-                .videoCodec('libx264')
-                .audioCodec('aac')
-                .audioBitrate('128k')
-                .videoBitrate('900k')
-                .format('mp4')
-                .on('end', resolve)
-                .on('error', reject)
-                .save(finalPath)
-        })
-
-        // 📤 Send video
-        await conn.sendMessage(from, {
-            video: fs.readFileSync(finalPath),
-            mimetype: "video/mp4",
-            caption: `🎬 *${vid.title}*\n\n> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴢᴏʀᴀɪʙ ᴍᴅ*`
-        }, { quoted: mek })
-
-        // 🧹 cleanup
-        fs.unlinkSync(rawPath)
-        fs.unlinkSync(finalPath)
-
-    } catch (err) {
-        console.error(err)
-        reply("❌ *Video processing error*")
+❌ *Error:* ${e.message}`);
     }
-})
+});

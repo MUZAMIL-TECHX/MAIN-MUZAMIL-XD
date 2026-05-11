@@ -154,7 +154,7 @@ async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, 
     }
 });
 cmd({
-    pattern: "setonline",
+    pattern: "online",
     desc: "Update Online Privacy",
     category: "privacy",
     react: "🔐",
@@ -179,7 +179,7 @@ async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, 
 });
 
 cmd({
-    pattern: "setpp",
+    pattern: "setdp",
     desc: "Set bot profile picture.",
     category: "privacy",
     react: "🖼️",
@@ -208,7 +208,7 @@ async (conn, mek, m, { from, isOwner, quoted, reply }) => {
 });
 
 cmd({
-    pattern: "setmyname",
+    pattern: "setname",
     desc: "Set your WhatsApp display name.",
     category: "privacy",
     react: "⚙️",

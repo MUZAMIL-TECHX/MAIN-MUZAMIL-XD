@@ -4,7 +4,7 @@ const { runtime } = require('../lib/functions');
 const axios = require('axios');
 
 cmd({
-    pattern: "menu",
+    pattern: "allmenu",
     desc: "Show interactive menu system",
     category: "menu",
     react: "🧾",
@@ -105,545 +105,581 @@ cmd({
         }
         
         const messageID = sentMsg.key.id;
-
-        // Menu data (complete version with all commands stacked vertically)
-        const menuData = {
-            '1': {
-                title: "📥 *Download Menu* 📥",
-                content: `╭━━━〔 *Download Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 📥 *Media & Social*
-┃★│ • gdrive
-┃★│ • apk
-┃★│ • apk2
-┃★│ • mfire
-┃★│ • mediafire
-┃★│ • twitter
-┃★│ • ig7
-┃★│ • ytcommunity
-┃★│ • ytpost
-┃★│ • spotify
-┃★│ • ringtone
-┃★│ • img
-┃★│ • facebook
-┃★│ • fb
-┃★│ • fb2
-┃★│ • githubstalk
-┃★│ • gitclone
-┃★│ • instagram2
-┃★│ • ig2
-┃★│ • igdl2
-┃★│ • igvideo4
-┃★│ • igdl4
-┃★│ • insta
-┃★│ • igdl
-┃★│ • modapk
-┃★│ • tiks
-┃★│ • tiktoksearch
-┃★│ • tiktokdl
-┃★│ • tiktok
-┃★│ • tt2
-┃★│ • sss
-┃★│ • pins
-┃★│ • pinterest
-┃★│ • pinterestdl
-┃★│ • pindl
-┃★│ • playvideo
-┃★│ • video
-┃★│ • video2-10
-┃★│ • ytsearch
-┃★│ • yts
-┃★│ • play
-┃★│ • play2-10
-┃★│ • play3
-┃★│ • audio
-┃★│ • ytmp2
-┃★│ • ytmp3
-┃★│ • ytmp4
-┃★│ • song
-┃★│ • gana
-┃★│ • upload
-┃★│ • geturl
-┃★│ • imgurl
-┃★│ • url
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+// Menu data - All commands vertical with emojis
+const menuData = {
+    '1': {
+        title: "📥 *DOWNLOAD MENU* 📥",
+        content: `╭━━━❪ 📥 𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃 ❫━━━┈⊷
+┃
+┃ ★ 𝐌𝐄𝐃𝐈𝐀 & 𝐒𝐎𝐂𝐈𝐀𝐋 ★
+┃
+┃ ✧ 📂 gdrive
+┃ ✧ 🌐 yts
+┃ ✧ 🌐 ytsearch <videoname>
+┃ ✧ 🎬 ytvideo <link>
+┃ ✧ 🎙songplay <link/name>
+┃ ✧ 🎙playsong <link/name>
+┃ ✧ 🎙splay <link/name>
+┃ ✧ 📱 apk
+┃ ✧ 📱 apk2
+┃ ✧ 💾 mfire
+┃ ✧ 💾 mediafire
+┃ ✧ 🐦 twitter
+┃ ✧ 📸 ig7
+┃ ✧ 📸 instagram2
+┃ ✧ 📸 ig2
+┃ ✧ 📸 igdl2
+┃ ✧ 📸 igvideo4
+┃ ✧ 📸 igdl4
+┃ ✧ 📸 insta
+┃ ✧ 📸 igdl
+┃ ✧ 📹 ytcommunity
+┃ ✧ 📹 ytpost
+┃ ✧ 🎵 spotify
+┃ ✧ 🎶 ringtone
+┃ ✧ 🖼️ img
+┃ ✧ 📘 facebook
+┃ ✧ 📘 fb
+┃ ✧ 📘 fb2
+┃ ✧ 💻 githubstalk
+┃ ✧ 💻 gitclone
+┃ ✧ 🎮 modapk
+┃ ✧ 🎵 tiks
+┃ ✧ 🔍 tiktoksearch
+┃ ✧ 📥 tiktokdl
+┃ ✧ 📥 tiktok
+┃ ✧ 📥 tt2
+┃ ✧ 📥 sss
+┃ ✧ 📌 pins
+┃ ✧ 📌 pinterest
+┃ ✧ 📌 pinterestdl
+┃ ✧ 📌 pindl
+┃ ✧ 🎬 playvideo
+┃ ✧ 🎬 video
+┃ ✧ 🎬 video2
+┃ ✧ 🎬 video3
+┃ ✧ 🎬 video4
+┃ ✧ 🎬 video5
+┃ ✧ 🎬 video6
+┃ ✧ 🎬 video7
+┃ ✧ 🎬 video8
+┃ ✧ 🎬 video9
+┃ ✧ 🎬 video10
+┃ ✧ 🔍 ytsearch
+┃ ✧ 🔍 yts
+┃ ✧ ▶️ play
+┃ ✧ ▶️ play2
+┃ ✧ ▶️ play3
+┃ ✧ ▶️ play4
+┃ ✧ ▶️ play5
+┃ ✧ ▶️ play6
+┃ ✧ ▶️ play7
+┃ ✧ ▶️ play8
+┃ ✧ ▶️ play9
+┃ ✧ ▶️ play10
+┃ ✧ 🎵 audio
+┃ ✧ 🎵 ytmp2
+┃ ✧ 🎵 ytmp3
+┃ ✧ 🎬 ytmp4
+┃ ✧ 🎵 song
+┃ ✧ 🎵 gana
+┃ ✧ 📤 upload
+┃ ✧ 🔗 geturl
+┃ ✧ 🖼️ imgurl
+┃ ✧ 🔗 url
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '2': {
-                title: "👥 *Group Menu* 👥",
-                content: `╭━━━〔 *Group Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 🛠️ *Group Management*
-┃★│ • grouplink
-┃★│ • antidelete
-┃★│ • antilink
-┃★│ • antilinks
-┃★│ • linksdelete
-┃★│ • deletelink
-┃★│ • antilinkkick
-┃★│ • kicklink
-┃★│ • cr
-┃★│ • creact
-┃★│ • rejectall
-┃★│ • acceptall
-┃★│ • requestlist
-┃★│ • grouppp
-┃★│ • groupunmute
-┃★│ • unmute
-┃★│ • unlock
-┃★│ • unlockgc
-┃★│ • removeall
-┃★│ • kickall
-┃★│ • kickall2
-┃★│ • kickall3
-┃★│ • tagall
-┃★│ • tagadmins
-┃★│ • tag
-┃★│ • hidetag
-┃★│ • resetglink
-┃★│ • revoke
-┃★│ • makeadmin
-┃★│ • promote
-┃★│ • poll
-┃★│ • out
-┃★│ • newgc
-┃★│ • mute
-┃★│ • groupmute
-┃★│ • lockgc
-┃★│ • invite
-┃★│ • leavegc
-┃★│ • left
-┃★│ • leave
-┃★│ • join
-┃★│ • gname
-┃★│ • upgname
-┃★│ • updategname
-┃★│ • updategdesc
-┃★│ • removeadmin
-┃★│ • dismiss
-┃★│ • demote
-┃★│ • admin
-┃★│ • add
-┃★│ • remove
-┃★│ • kick
-┃★│ • welcome
-┃★│ • admin-events
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '2': {
+        title: "👥 *GROUP MENU* 👥",
+        content: `╭━━━❪ 👥 𝐆𝐑𝐎𝐔𝐏 ❫━━━┈⊷
+┃
+┃ ★ 𝐆𝐑𝐎𝐔𝐏 𝐌𝐀𝐍𝐀𝐆𝐄𝐌𝐄𝐍𝐓 ★
+┃
+┃ ✧ 🔗 grouplink
+┃ ✧ 🛡️ antidelete
+┃ ✧ 🔗 antilink
+┃ ✧ 🔗 antilinks
+┃ ✧ 🗑️ linksdelete
+┃ ✧ 🦶 deletelink
+┃ ✧ ⚠️ antilinkkick
+┃ ✧ 👢 kicklink
+┃ ✧ ➕ cr
+┃ ✧ ➕ creact
+┃ ✧ ❌ rejectall
+┃ ✧ ✅ acceptall
+┃ ✧ 📋 requestlist
+┃ ✧ 🖼️ grouppp
+┃ ✧ 🔓 groupunmute
+┃ ✧ 🔓 unmute
+┃ ✧ 🔓 unlock
+┃ ✧ 🔓 unlockgc
+┃ ✧ 🗑️ removeall
+┃ ✧ 👢 kickall
+┃ ✧ 👢 kickall2
+┃ ✧ 👢 kickall3
+┃ ✧ 📢 tagall
+┃ ✧ 👑 tagadmins
+┃ ✧ 📢 tag
+┃ ✧ 🙈 hidetag
+┃ ✧ 🔄 resetglink
+┃ ✧ 🔄 revoke
+┃ ✧ 👑 makeadmin
+┃ ✧ ⬆️ promote
+┃ ✧ 📊 poll
+┃ ✧ 🚪 out
+┃ ✧ 🆕 newgc
+┃ ✧ 🔇 mute
+┃ ✧ 🔇 groupmute
+┃ ✧ 🔒 lockgc
+┃ ✧ 📨 invite
+┃ ✧ 🚪 leavegc
+┃ ✧ 🚪 left
+┃ ✧ 🚪 leave
+┃ ✧ ✅ join
+┃ ✧ ✏️ gname
+┃ ✧ ✏️ upgname
+┃ ✧ ✏️ updategname
+┃ ✧ 📝 updategdesc
+┃ ✧ 📉 removeadmin
+┃ ✧ 📉 dismiss
+┃ ✧ 📉 demote
+┃ ✧ 👑 admin
+┃ ✧ ➕ add
+┃ ✧ ❌ remove
+┃ ✧ 👢 kick
+┃ ✧ 👋 welcome
+┃ ✧ ⚙️ admin-events
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '3': {
-                title: "😄 *Fun Menu* 😄",
-                content: `╭━━━〔 *Fun Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 🎭 *Games & Fun*
-┃★│ • drama
-┃★│ • couplepp
-┃★│ • match
-┃★│ • love
-┃★│ • ship
-┃★│ • larki
-┃★│ • bachi
-┃★│ • larka
-┃★│ • bacha
-┃★│ • marige
-┃★│ • nikal
-┃★│ • hot
-┃★│ • confused
-┃★│ • moon
-┃★│ • shy
-┃★│ • sad
-┃★│ • angry
-┃★│ • heart
-┃★│ • happy
-┃★│ • chutiya
-┃★│ • gandu
-┃★│ • tatta
-┃★│ • funny
-┃★│ • meme
-┃★│ • dare
-┃★│ • truth
-┃★│ • flirt
-┃★│ • joke
-┃★│ • rate
-┃★│ • shapar
-┃★│ • insult
-┃★│ • hack
-┃★│ • character
-┃★│ • pickup
-┃★│ • hrt
-┃★│ • hpy
-┃★│ • syd
-┃★│ • anger
-┃★│ • mon
-┃★│ • cunfuzed
-┃★│ • muth
-┃★│ • fuck
-┃★│ • finger
-┃★│ • fingering
-┃★│ • sex
-┃★│ • sex @user
-┃★│ • muth @user
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '3': {
+        title: "😄 *FUN MENU* 😄",
+        content: `╭━━━❪ 😄 𝐅𝐔𝐍 ❫━━━┈⊷
+┃
+┃ ★ 𝐆𝐀𝐌𝐄𝐒 & 𝐄𝐍𝐓𝐄𝐑𝐓𝐀𝐈𝐍𝐌𝐄𝐍𝐓 ★
+┃
+┃ ✧ 🎭 drama
+┃ ✧ 💑 couplepp
+┃ ✧ 💖 match
+┃ ✧ 💕 love
+┃ ✧ ⛴️ ship
+┃ ✧ 👧 larki
+┃ ✧ 👧 bachi
+┃ ✧ 👦 larka
+┃ ✧ 👦 bacha
+┃ ✧ 💍 marige
+┃ ✧ 🚶 nikal
+┃ ✧ 😕 confused
+┃ ✧ 🌙 moon
+┃ ✧ 😊 shy
+┃ ✧ 😢 sad
+┃ ✧ 😠 angry
+┃ ✧ 💓 heart
+┃ ✧ 😊 happy
+┃ ✧ 🤡 chutiya
+┃ ✧ 🤬 gandu
+┃ ✧ 🍒 tatta
+┃ ✧ 😂 funny
+┃ ✧ 🖼️ meme
+┃ ✧ 🎯 dare
+┃ ✧ ❓ truth
+┃ ✧ 💘 flirt
+┃ ✧ 😂 joke
+┃ ✧ ⭐ rate
+┃ ✧ 🔪 shapar
+┃ ✧ 😤 insult
+┃ ✧ 💻 hack
+┃ ✧ 🔥 character
+┃ ✧ 💬 pickup
+┃ ✧ ❤️ hrt
+┃ ✧ 😊 hpy
+┃ ✧ 😢 syd
+┃ ✧ 😠 anger
+┃ ✧ 🌙 mon
+┃ ✧ 😕 cunfuzed
+┃ ✧ 💣 boom
+┃ ✧ 💥 playboomgame
+┃ ✧ 🎮 join
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '4': {
-                title: "👑 *Owner Menu* 👑",
-                content: `╭━━━〔 *Owner Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ ⚠️ *System Settings*
-┃★│ • bot
-┃★│ • vv
-┃★│ • vv2
-┃★│ • vv3
-┃★│ • id
-┃★│ • jid
-┃★│ • gjid
-┃★│ • version
-┃★│ • setting
-┃★│ • env
-┃★│ • get
-┃★│ • gpass
-┃★│ • autostatusreply
-┃★│ • autoreact
-┃★│ • autoreply
-┃★│ • autosticker
-┃★│ • antibadword
-┃★│ • autoread
-┃★│ • status-react
-┃★│ • autostatusview
-┃★│ • auto-seen
-┃★│ • autorecoding
-┃★│ • always-online
-┃★│ • mention-reply
-┃★│ • auto-typing
-┃★│ • setmode
-┃★│ • mode
-┃★│ • prefix
-┃★│ • setprefix
-┃★│ • upgradeupdate
-┃★│ • listsudo
-┃★│ • deletesudo
-┃★│ • delowner
-┃★│ • delsudo
-┃★│ • addowner
-┃★│ • addsudo
-┃★│ • setsudo
-┃★│ • dmlist
-┃★│ • sendfile
-┃★│ • senddm
-┃★│ • npm
-┃★│ • rw
-┃★│ • getprivacy
-┃★│ • groupsprivacy
-┃★│ • updatebio
-┃★│ • setmyname
-┃★│ • setonline
-┃★│ • setppall
-┃★│ • getbio
-┃★│ • privacymenu
-┃★│ • privacy
-┃★│ • status
-┃★│ • post
-┃★│ • delete
-┃★│ • clearchats
-┃★│ • shutdown
-┃★│ • convert
-┃★│ • fetch
-┃★│ • forward
-┃★│ • checkotp
-┃★│ • otpbox
-┃★│ • listnumbers
-┃★│ • templist
-┃★│ • tempnumber
-┃★│ • tempnum
-┃★│ • msg
-┃★│ • report
-┃★│ • savecontact
-┃★│ • ghosthelp
-┃★│ • vanishing
-┃★│ • temppoll
-┃★│ • ghostpoll
-┃★│ • ghostvideo
-┃★│ • ghostpic
-┃★│ • ghost
-┃★│ • tempmsg
-┃★│ • disappear
-┃★│ • creator
-┃★│ • source
-┃★│ • block
-┃★│ • unblock
-┃★│ • fullpp
-┃★│ • updatecmd
-┃★│ • listcmd
-┃★│ • allmenu
-┃★│ • bomber
-┃★│ • bomb
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '4': {
+        title: "👑 *OWNER MENU* 👑",
+        content: `╭━━━❪ 👑 𝐎𝐖𝐍𝐄𝐑 ❫━━━┈⊷
+┃
+┃ ★ 𝐒𝐘𝐒𝐓𝐄𝐌 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒 ★
+┃
+┃ ✧ 🤖 bot
+┃ ✧ 📋 vv
+┃ ✧ 📋 vv2
+┃ ✧ 📋 vv3
+┃ ✧ 🆔 id
+┃ ✧ 🆔 jid
+┃ ✧ 🆔 gjid
+┃ ✧ 📌 version
+┃ ✧ ⚙️ setting
+┃ ✧ 🔧 env
+┃ ✧ 📥 get
+┃ ✧ 🔑 gpass
+┃ ✧ 📨 autostatusreply
+┃ ✧ ❤️ autoreact
+┃ ✧ 💬 autoreply
+┃ ✧ 🎨 autosticker
+┃ ✧ 🚫 antibadword
+┃ ✧ 👁️ autoread
+┃ ✧ 😊 status-react
+┃ ✧ 👀 autostatusview
+┃ ✧ 👀 auto-seen
+┃ ✧ 📹 autorecoding
+┃ ✧ 🌐 always-online
+┃ ✧ 💬 mention-reply
+┃ ✧ ⌨️ auto-typing
+┃ ✧ 🎮 setmode
+┃ ✧ 🎮 mode
+┃ ✧ 🔣 prefix
+┃ ✧ 🔣 setprefix
+┃ ✧ ⬆️ upgradeupdate
+┃ ✧ 📋 listsudo
+┃ ✧ 🗑️ deletesudo
+┃ ✧ 🗑️ delowner
+┃ ✧ 🗑️ delsudo
+┃ ✧ ➕ addowner
+┃ ✧ ➕ addsudo
+┃ ✧ 🔧 setsudo
+┃ ✧ 📨 dmlist
+┃ ✧ 📁 sendfile
+┃ ✧ 📨 senddm
+┃ ✧ 📦 npm
+┃ ✧ 📁 rw
+┃ ✧ 🔒 getprivacy
+┃ ✧ 👥 groupsprivacy
+┃ ✧ 📝 updatebio
+┃ ✧ ✏️ setmyname
+┃ ✧ 🟢 setonline
+┃ ✧ 🖼️ setppall
+┃ ✧ 📝 getbio
+┃ ✧ 🔒 privacymenu
+┃ ✧ 🔒 privacy
+┃ ✧ 📊 status
+┃ ✧ 📤 post
+┃ ✧ 🗑️ delete
+┃ ✧ 🗑️ clearchats
+┃ ✧ 🔌 shutdown
+┃ ✧ 🔄 convert
+┃ ✧ 📥 fetch
+┃ ✧ 📨 forward
+┃ ✧ 🔍 checkotp
+┃ ✧ 📦 otpbox
+┃ ✧ 📋 listnumbers
+┃ ✧ 📋 templist
+┃ ✧ 📱 tempnumber
+┃ ✧ 📱 tempnum
+┃ ✧ 💬 msg
+┃ ✧ 📊 report
+┃ ✧ 💾 savecontact
+┃ ✧ 👻 ghosthelp
+┃ ✧ 👻 vanishing
+┃ ✧ 📊 temppoll
+┃ ✧ 👻 ghostpoll
+┃ ✧ 🎬 ghostvideo
+┃ ✧ 🖼️ ghostpic
+┃ ✧ 👻 ghost
+┃ ✧ 💬 tempmsg
+┃ ✧ 👻 disappear
+┃ ✧ 👨‍💻 creator
+┃ ✧ 📂 source
+┃ ✧ 🚫 block
+┃ ✧ ✅ unblock
+┃ ✧ 🖼️ fullpp
+┃ ✧ 🔄 updatecmd
+┃ ✧ 📋 listcmd
+┃ ✧ 📋 allmenu
+┃ ✧ 💣 bomber
+┃ ✧ 🎯 sim
+┃ ✧ 🥏 siminfo
+┃ ✧ 🥊 cnicinfo
+┃ ✧ 💣 bomb
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '5': {
-                title: "🤖 *AI Menu* 🤖",
-                content: `╭━━━〔 *AI Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 💬 *Intelligence*
-┃★│ • ai
-┃★│ • openai
-┃★│ • gpt
-┃★│ • gpt2
-┃★│ • gpt3
-┃★│ • gptmini
-┃★│ • deepseek
-┃★│ • meta
-┃★│ • stabilityai
-┃★│ • stablediffusion
-┃★│ • fluxai
-┃★│ • imgscan
-┃★│ • aivoice
-┃★│ • imagine
-┃★│ • imagine2
-┃★│ • blackbox
-┃★│ • luma
-┃★│ • dj
-┃★│ • khan
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '5': {
+        title: "🤖 *AI MENU* 🤖",
+        content: `╭━━━❪ 🤖 𝐀𝐈 ❫━━━┈⊷
+┃
+┃ ★ 𝐈𝐍𝐓𝐄𝐋𝐋𝐈𝐆𝐄𝐍𝐂𝐄 ★
+┃
+┃ ✧ 🧠 ai
+┃ ✧ 🧠 openai
+┃ ✧ 🧠 gpt
+┃ ✧ 🧠 gpt2
+┃ ✧ 🧠 gpt3
+┃ ✧ 🧠 gptmini
+┃ ✧ 🧠 deepseek
+┃ ✧ 🧠 meta
+┃ ✧ 🎨 stabilityai
+┃ ✧ 🎨 stablediffusion
+┃ ✧ 🎨 fluxai
+┃ ✧ 🔍 imgscan
+┃ ✧ 🎤 aivoice
+┃ ✧ 🎨 imagine
+┃ ✧ 🎨 imagine2
+┃ ✧ 📦 blackbox
+┃ ✧ 🎬 luma
+┃ ✧ 🎵 dj
+┃ ✧ 📚 khan
+┃ ✧ 🌐 createimg
+┃ ✧ 🗺️ nenobanana
+┃ ✧ 🗾 img
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '6': {
-                title: "🎎 *Anime Menu* 🎎",
-                content: `╭━━━〔 *Anime Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 🖼️ *Otaku World*
-┃★│ • anime
-┃★│ • anime1
-┃★│ • anime2
-┃★│ • anime3
-┃★│ • anime4
-┃★│ • anime5
-┃★│ • animegirl
-┃★│ • animegirl1
-┃★│ • animegirl2
-┃★│ • animegirl3
-┃★│ • animegirl4
-┃★│ • animegirl5
-┃★│ • awoo
-┃★│ • maid
-┃★│ • megumin
-┃★│ • neko
-┃★│ • waifu
-┃★│ • garl
-┃★│ • naruto
-┃★│ • dragonball
-┃★│ • fack
-┃★│ • dog
-┃★│ • foxgirl
-┃★│ • loli
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '6': {
+        title: "🎎 *ANIME MENU* 🎎",
+        content: `╭━━━❪ 🎎 𝐀𝐍𝐈𝐌𝐄 ❫━━━┈⊷
+┃
+┃ ★ 𝐎𝐓𝐀𝐊𝐔 𝐖𝐎𝐑𝐋𝐃 ★
+┃
+┃ ✧ 🖼️ anime
+┃ ✧ 🖼️ anime1
+┃ ✧ 🖼️ anime2
+┃ ✧ 🖼️ anime3
+┃ ✧ 🖼️ anime4
+┃ ✧ 🖼️ anime5
+┃ ✧ 👧 animegirl
+┃ ✧ 👧 animegirl1
+┃ ✧ 👧 animegirl2
+┃ ✧ 👧 animegirl3
+┃ ✧ 👧 animegirl4
+┃ ✧ 👧 animegirl5
+┃ ✧ 🐺 awoo
+┃ ✧ 👘 maid
+┃ ✧ 🧙 megumin
+┃ ✧ 🐱 neko
+┃ ✧ 👘 waifu
+┃ ✧ 👧 garl
+┃ ✧ 🍥 naruto
+┃ ✧ 🐉 dragonball
+┃ ✧ 😜 fack
+┃ ✧ 🐕 dog
+┃ ✧ 🦊 foxgirl
+┃ ✧ 🥵 fuck @user
+┃ ✧ 🥶 muth @user
+┃ ✧ 🥴 fingering @user
+┃ ✧ 😩 gand
+┃ ✧ 👧 loli
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '7': {
-                title: "🔄 *Convert Menu* 🔄",
-                content: `╭━━━〔 *Convert Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 🎨 *Edits & Styles*
-┃★│ • style
-┃★│ • font
-┃★│ • fancy
-┃★│ • typography
-┃★│ • paint
-┃★│ • frozen
-┃★│ • castle
-┃★│ • tatoo
-┃★│ • bulb
-┃★│ • angelwings
-┃★│ • zodiac
-┃★│ • luxury
-┃★│ • boom
-┃★│ • hacker
-┃★│ • devilwings
-┃★│ • nigeria
-┃★│ • sunset
-┃★│ • leaf
-┃★│ • galaxy
-┃★│ • sans
-┃★│ • clouds
-┃★│ • futuristic
-┃★│ • eraser
-┃★│ • america
-┃★│ • thor
-┃★│ • sadgirl
-┃★│ • neonlight
-┃★│ • blackpink
-┃★│ • deadpool
-┃★│ • 3dcomic
-┃★│ • wanted
-┃★│ • removebg
-┃★│ • rmbg
-┃★│ • nokia
-┃★│ • imgjoke
-┃★│ • jail
-┃★│ • invert
-┃★│ • grey
-┃★│ • bluredit
-┃★│ • blur
-┃★│ • ad
-┃★│ • sticker
-┃★│ • sticker2
-┃★│ • emojimix
-┃★│ • stake
-┃★│ • take
-┃★│ • save
-┃★│ • send
-┃★│ • tomp3
-┃★│ • wallpaper
-┃★│ • recaption
-┃★│ • caption
-┃★│ • getpp
-┃★│ • setpp
-┃★│ • attp
-┃★│ • vsticker
-┃★│ • trt
-┃★│ • tts
-┃★│ • voicehelp
-┃★│ • voicedeep
-┃★│ • voicechipmunk
-┃★│ • voicegirl
-┃★│ • base64
-┃★│ • unbase64
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '7': {
+        title: "🔄 *CONVERT MENU* 🔄",
+        content: `╭━━━❪ 🔄 𝐂𝐎𝐍𝐕𝐄𝐑𝐓 ❫━━━┈⊷
+┃
+┃ ★ 𝐄𝐃𝐈𝐓𝐒 & 𝐒𝐓𝐘𝐋𝐄𝐒 ★
+┃
+┃ ✧ 🎨 style
+┃ ✧ 🔤 font
+┃ ✧ ✨ fancy
+┃ ✧ 📝 typography
+┃ ✧ 🎨 paint
+┃ ✧ ❄️ frozen
+┃ ✧ 🏰 castle
+┃ ✧ 🖋️ tatoo
+┃ ✧ 💡 bulb
+┃ ✧ 👼 angelwings
+┃ ✧ ♈ zodiac
+┃ ✧ 💎 luxury
+┃ ✧ 💥 boom
+┃ ✧ 💻 hacker
+┃ ✧ 👿 devilwings
+┃ ✧ 🇳🇬 nigeria
+┃ ✧ 🌅 sunset
+┃ ✧ 🍃 leaf
+┃ ✧ 🌌 galaxy
+┃ ✧ 💀 sans
+┃ ✧ ☁️ clouds
+┃ ✧ 🚀 futuristic
+┃ ✧ 🧽 eraser
+┃ ✧ 🇺🇸 america
+┃ ✧ ⚡ thor
+┃ ✧ 😢 sadgirl
+┃ ✧ 💡 neonlight
+┃ ✧ 🖤 blackpink
+┃ ✧ 🦸 deadpool
+┃ ✧ 📚 3dcomic
+┃ ✧ 📜 wanted
+┃ ✧ 🖼️ removebg
+┃ ✧ 🖼️ rmbg
+┃ ✧ 📱 nokia
+┃ ✧ 😂 imgjoke
+┃ ✧ 🔒 jail
+┃ ✧ 🔄 invert
+┃ ✧ ⚫ grey
+┃ ✧ 🌫️ bluredit
+┃ ✧ 🌫️ blur
+┃ ✧ 📢 ad
+┃ ✧ 🏷️ sticker
+┃ ✧ 🏷️ sticker2
+┃ ✧ 😊 emojimix
+┃ ✧ 📊 stake
+┃ ✧ 📸 take
+┃ ✧ 💾 save
+┃ ✧ 📨 send
+┃ ✧ 🎵 tomp3
+┃ ✧ 🖼️ wallpaper
+┃ ✧ 📝 recaption
+┃ ✧ 📝 caption
+┃ ✧ 🖼️ getpp
+┃ ✧ 🖼️ setpp
+┃ ✧ 🎨 attp
+┃ ✧ 🎬 vsticker
+┃ ✧ 🔄 trt
+┃ ✧ 🎤 tts
+┃ ✧ 🎤 voicehelp
+┃ ✧ 🎤 voicedeep
+┃ ✧ 🐿️ voicechipmunk
+┃ ✧ 👧 voicegirl
+┃ ✧ 🔢 base64
+┃ ✧ 🔓 unbase64
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '8': {
-                title: "📌 *Other Menu* 📌",
-                content: `╭━━━〔 *Other Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 🛠️ *Utilities*
-┃★│ • uptime
-┃★│ • weather
-┃★│ • define
-┃★│ • greet
-┃★│ • goodnight
-┃★│ • goodevening
-┃★│ • goodafternoon
-┃★│ • goodmorning
-┃★│ • picture
-┃★│ • getprofile
-┃★│ • getinfo
-┃★│ • speed
-┃★│ • news
-┃★│ • movieinfo
-┃★│ • movie
-┃★│ • sysinfo
-┃★│ • quranmenu
-┃★│ • surah
-┃★│ • quran
-┃★│ • prayertimes
-┃★│ • praytime
-┃★│ • pins
-┃★│ • pin
-┃★│ • pong
-┃★│ • countryinfo
-┃★│ • calculate
-┃★│ • count
-┃★│ • countx
-┃★│ • date
-┃★│ • timenow
-┃★│ • pick
-┃★│ • flip
-┃★│ • coinflip
-┃★│ • roll
-┃★│ • urldecode
-┃★│ • urlencode
-┃★│ • dbinary
-┃★│ • binaryrcolor
-┃★│ • rcolor
-┃★│ • topdf
-┃★│ • person
-┃★│ • genmail
-┃★│ • tempmail
-┃★│ • wiki
-┃★│ • wikipedia
-┃★│ • wstalk
-┃★│ • readmore
-┃★│ • repeat
-┃★│ • fact
-┃★│ • tiktokstalk
-┃★│ • valorant
-┃★│ • bear
-┃★│ • birthday
-┃★│ • cat
-┃★│ • dog
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '8': {
+        title: "📌 *OTHER MENU* 📌",
+        content: `╭━━━❪ 📌 𝐎𝐓𝐇𝐄𝐑 ❫━━━┈⊷
+┃
+┃ ★ 𝐔𝐓𝐈𝐋𝐈𝐓𝐈𝐄𝐒 ★
+┃
+┃ ✧ ⏱️ uptime
+┃ ✧ 🌤️ weather
+┃ ✧ 📖 define
+┃ ✧ 👋 greet
+┃ ✧ 🌙 goodnight
+┃ ✧ 🌆 goodevening
+┃ ✧ ☀️ goodafternoon
+┃ ✧ 🌅 goodmorning
+┃ ✧ 🖼️ picture
+┃ ✧ 👤 getprofile
+┃ ✧ ℹ️ getinfo
+┃ ✧ ⚡ speed
+┃ ✧ 📰 news
+┃ ✧ 🎬 movieinfo
+┃ ✧ 🎬 movie
+┃ ✧ 💻 sysinfo
+┃ ✧ 📖 quranmenu
+┃ ✧ 📖 surah
+┃ ✧ 📖 quran
+┃ ✧ 🕌 prayertimes
+┃ ✧ 🕌 praytime
+┃ ✧ 📌 pins
+┃ ✧ 📌 pin
+┃ ✧ 🏓 pong
+┃ ✧ 🌍 countryinfo
+┃ ✧ 🧮 calculate
+┃ ✧ 🔢 count
+┃ ✧ ❌ countx
+┃ ✧ 📅 date
+┃ ✧ ⏰ timenow
+┃ ✧ 🎲 pick
+┃ ✧ 🪙 flip
+┃ ✧ 🪙 coinflip
+┃ ✧ 🎲 roll
+┃ ✧ 🔓 urldecode
+┃ ✧ 🔒 urlencode
+┃ ✧ 💾 dbinary
+┃ ✧ 🎨 binaryrcolor
+┃ ✧ 🎨 rcolor
+┃ ✧ 📄 topdf
+┃ ✧ 👤 person
+┃ ✧ 📧 genmail
+┃ ✧ 📧 tempmail
+┃ ✧ 📚 wiki
+┃ ✧ 📚 wikipedia
+┃ ✧ 🔍 wstalk
+┃ ✧ 📖 readmore
+┃ ✧ 🔁 repeat
+┃ ✧ 🧠 fact
+┃ ✧ 🔍 tiktokstalk
+┃ ✧ 🎮 valorant
+┃ ✧ 🐻 bear
+┃ ✧ 🎂 birthday
+┃ ✧ 🐱 cat
+┃ ✧ 🐕 dog
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '9': {
-                title: "💞 *Reactions Menu* 💞",
-                content: `╭━━━〔 *Reactions Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 🥰 *Feelings*
-┃★│ • kiss
-┃★│ • slap
-┃★│ • dance
-┃★│ • cringe
-┃★│ • poke
-┃★│ • bite
-┃★│ • wink
-┃★│ • smile
-┃★│ • wave
-┃★│ • highfive
-┃★│ • handhold
-┃★│ • blush
-┃★│ • yeet
-┃★│ • smug
-┃★│ • pat
-┃★│ • lick
-┃★│ • hug
-┃★│ • bully
-┃★│ • cuddle
-┃★│ • cry
-┃★│ • kill
-┃★│ • bonk
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '9': {
+        title: "💞 *REACTIONS MENU* 💞",
+        content: `╭━━━❪ 💞 𝐑𝐄𝐀𝐂𝐓𝐈𝐎𝐍𝐒 ❫━━━┈⊷
+┃
+┃ ★ 𝐅𝐄𝐄𝐋𝐈𝐍𝐆𝐒 & 𝐄𝐌𝐎𝐓𝐈𝐎𝐍𝐒 ★
+┃
+┃ ✧ 💋 kiss
+┃ ✧ ✋ slap
+┃ ✧ 💃 dance
+┃ ✧ 😬 cringe
+┃ ✧ 👉 poke
+┃ ✧ 🦷 bite
+┃ ✧ 😉 wink
+┃ ✧ 😊 smile
+┃ ✧ 👋 wave
+┃ ✧ 🖐️ highfive
+┃ ✧ 🤝 handhold
+┃ ✧ 😊 blush
+┃ ✧ 🤾 yeet
+┃ ✧ 😏 smug
+┃ ✧ 🖐️ pat
+┃ ✧ 👅 lick
+┃ ✧ 🤗 hug
+┃ ✧ 👊 bully
+┃ ✧ 🫂 cuddle
+┃ ✧ 😢 cry
+┃ ✧ 🔪 kill
+┃ ✧ 🔨 bonk
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            },
-            '10': {
-                title: "🏠 *Main Menu* 🏠",
-                content: `╭━━━〔 *Main Menu* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ ℹ️ *Bot Info*
-┃★│ • ping
-┃★│ • live
-┃★│ • alive
-┃★│ • runtime
-┃★│ • repo
-┃★│ • owner
-┃★│ • menu
-┃★│ • menu2
-┃★│ • restart
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+        image: true
+    },
+    '10': {
+        title: "🏠 *MAIN MENU* 🏠",
+        content: `╭━━━❪ 🏠 𝐌𝐀𝐈𝐍 ❫━━━┈⊷
+┃
+┃ ★ 𝐁𝐎𝐓 𝐈𝐍𝐅𝐎𝐑𝐌𝐀𝐓𝐈𝐎𝐍 ★
+┃
+┃ ✧ 🏓 ping
+┃ ✧ 🟢 live
+┃ ✧ 🟢 alive
+┃ ✧ 📂 repo
+┃ ✧ 👑 owner
+┃ ✧ 📋 menu
+┃ ✧ 📋 menu2
+┃ ✧ 🔄 restart
+┃ ✧ 🎗 setdp
+┃ ✧ 🎗 setname
+┃ ✧ 🎗 online
+┃
+╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`,
-                image: true
-            }
-        };
-
+        image: true
+    }
+};
         // Message handler with improved error handling
         const handler = async (msgData) => {
             try {

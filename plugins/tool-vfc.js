@@ -39,7 +39,7 @@ cmd({
         await conn.sendMessage(from, {
             document: fs.readFileSync(nmfilect), 
             mimetype: 'text/vcard', 
-            fileName: 'ZORAIB-MD.vcf', 
+            fileName: 'MUZAMIL-XD.vcf', 
             caption: `\nDone saving.\nGroup Name: *${cmiggc.subject}*\nContacts: *${cmiggc.participants.length}*\n> ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴢᴏʀᴀɪʙ ᴍᴅ`}, { quoted: mek });
 
         fs.unlinkSync(nmfilect); // Cleanup the file after sending

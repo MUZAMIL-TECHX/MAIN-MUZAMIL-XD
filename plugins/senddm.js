@@ -37,7 +37,7 @@ cmd({
             
             try {
                 await conn.sendMessage(user, {
-                    text: `📨 *Message from ${pushName || "ZORAIB-MD Owner"}*\n\n${message}\n\n_This is a private message_`
+                    text: `📨 *Message from ${pushName || "MUZAMIL-XD Owner"}*\n\n${message}\n\n_This is a private message_`
                 });
                 
                 await reply(`✅ *Message sent to @${username}*`);

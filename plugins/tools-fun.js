@@ -18,7 +18,7 @@ cmd({
       return reply("❌ Failed to fetch a joke. Please try again.");
     }
 
-    const jokeMessage = `🤣 *Here's a random joke for you!* 🤣\n\n*${joke.setup}*\n\n${joke.punchline} 😆\n\n> *BOSS-𝐌𝐃*`;
+    const jokeMessage = `🤣 *Here's a random joke for you!* 🤣\n\n*${joke.setup}*\n\n${joke.punchline} 😆\n\n> *MUZAMIL-XD*`;
 
     return reply(jokeMessage);
   } catch (error) {
@@ -166,7 +166,7 @@ cmd({
       return reply("❌ Failed to fetch a fun fact. Please try again.");
     }
 
-    const factMessage = `🧠 *Random Fun Fact* 🧠\n\n${fact}\n\nIsn't that interesting? 😄\n\n> *Boss-𝐌𝐃*`;
+    const factMessage = `🧠 *Random Fun Fact* 🧠\n\n${fact}\n\nIsn't that interesting? 😄\n\n> *MUZAMIL-XD*`;
 
     return reply(factMessage);
   } catch (error) {
@@ -174,7 +174,424 @@ cmd({
     return reply("⚠️ An error occurred while fetching a fun fact. Please try again later.");
   }
 });
+const activeGames = new Map(); // Store active game sessions
 
+cmd({
+  pattern: "playboomgame",
+  desc: "💥 Start a 2-player Boom Game - Challenge someone!",
+  react: "💥",
+  category: "fun",
+  filename: __filename
+}, async (conn, m, store, { reply, sender, pushName, react }) => {
+  try {
+    const groupId = m.key.remoteJid;
+    
+    // Check if game already exists in this group
+    if (activeGames.has(groupId)) {
+      return reply("❌ *A game is already active in this group!*\n\nLet that game finish first 🎮");
+    }
+    
+    await react("🎲");
+    
+    // Create game session
+    const gameData = {
+      host: sender,
+      hostName: pushName || sender.split('@')[0],
+      players: [],
+      status: 'waiting', // waiting, playing, finished
+      currentTurn: null,
+      boxes: [],
+      bombPosition: null,
+      turnStartTime: null,
+      timerInterval: null,
+      msgKey: null,
+      winner: null,
+      loser: null
+    };
+    
+    // Initial message
+    let teks = `💥 *ＢＯＯＭ ＧＡＭＥ* 💥\n\n`;
+    teks += `🎮 *Host:* @${sender.split('@')[0]}\n`;
+    teks += `👥 *Status:* Waiting for players\n\n`;
+    teks += `┌─────────────────┐\n`;
+    teks += `│  📢 *REQUIREMENT* │\n`;
+    teks += `│  Need 2 players  │\n`;
+    teks += `└─────────────────┘\n\n`;
+    teks += `✨ *Reply* *.join* ✨\n`;
+    teks += `to participate in the game!\n\n`;
+    teks += `⏱️ *Wait Time:* 60 seconds\n\n`;
+    teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
+    
+    const gameMsg = await reply(teks, { mentions: [sender] });
+    gameData.msgKey = gameMsg.key;
+    
+    // Set timeout for joining (60 seconds)
+    const joinTimeout = setTimeout(() => {
+      const game = activeGames.get(groupId);
+      if (game && game.status === 'waiting') {
+        if (game.players.length < 2) {
+          reply(`⏰ *Time's up!*\n\nNot enough players joined.\nGame cancelled ❌\n\n💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`);
+          activeGames.delete(groupId);
+        }
+      }
+    }, 60000);
+    
+    gameData.joinTimeout = joinTimeout;
+    activeGames.set(groupId, gameData);
+    
+  } catch (error) {
+    console.error('Error in playboomgame:', error);
+    reply(`❌ Error: ${error.message}\n\n💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`);
+  }
+});
+
+// ========== JOIN COMMAND ==========
+cmd({
+  pattern: "join",
+  desc: "🎮 Join a Boom Game",
+  react: "🎮",
+  category: "fun",
+  filename: __filename
+}, async (conn, m, store, { reply, sender, pushName, react }) => {
+  try {
+    const groupId = m.key.remoteJid;
+    const game = activeGames.get(groupId);
+    
+    if (!game) {
+      return reply("❌ *No active game found!*\n\nUse *.playboomgame* to start one 🎮");
+    }
+    
+    if (game.status !== 'waiting') {
+      return reply("❌ *Game already started!*\n\nWait for the next round 🎯");
+    }
+    
+    if (game.players.length >= 2) {
+      return reply("❌ *Game is full!*\n\nMaximum 2 players allowed 👥");
+    }
+    
+    if (game.players.some(p => p.id === sender)) {
+      return reply("❌ *You already joined!*\n\nWaiting for other player 👤");
+    }
+    
+    // Add player
+    game.players.push({
+      id: sender,
+      name: pushName || sender.split('@')[0],
+      score: 0
+    });
+    
+    await react("✅");
+    
+    // Update game message
+    let teks = `💥 *ＢＯＯＭ ＧＡＭＥ* 💥\n\n`;
+    teks += `🎮 *Host:* @${game.host.split('@')[0]}\n`;
+    teks += `👥 *Players:* ${game.players.length}/2\n\n`;
+    teks += `┌─────────────────┐\n`;
+    teks += `│  ✅ *JOINED* ✅   │\n`;
+    teks += `└─────────────────┘\n\n`;
+    teks += `✨ *Player 1:* @${game.host.split('@')[0]}\n`;
+    teks += `✨ *Player 2:* @${sender.split('@')[0]}\n\n`;
+    
+    if (game.players.length === 2) {
+      teks += `━━━━━━━━━━━━━━━━━━\n`;
+      teks += `│  🎲 *GAME READY!*  │\n`;
+      teks += `│  Starting soon... │\n`;
+      teks += `━━━━━━━━━━━━━━━━━━\n\n`;
+      teks += `⏱️ *Game will start in 5 seconds*\n`;
+      
+      await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [game.host, sender] });
+      
+      // Clear join timeout and start game
+      clearTimeout(game.joinTimeout);
+      setTimeout(() => startGame(conn, groupId, reply), 5000);
+    } else {
+      teks += `⏱️ *Waiting for 1 more player...*\n`;
+      teks += `⏰ *Time left:* ${Math.ceil((60000 - (Date.now() - game.joinTimeout._idleStart)) / 1000)}s\n\n`;
+      teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
+      
+      await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [game.host, sender] });
+    }
+    
+  } catch (error) {
+    console.error('Error in join:', error);
+    reply(`❌ Error: ${error.message}`);
+  }
+});
+
+// ========== START GAME FUNCTION ==========
+async function startGame(conn, groupId, reply) {
+  const game = activeGames.get(groupId);
+  if (!game || game.players.length !== 2) return;
+  
+  game.status = 'playing';
+  
+  // Randomly choose first player
+  const firstPlayer = Math.random() < 0.5 ? game.players[0] : game.players[1];
+  game.currentTurn = firstPlayer.id;
+  game.turnStartTime = Date.now();
+  
+  // Create 9 boxes (1 bomb, 8 safe)
+  const boxes = [];
+  for (let i = 1; i <= 9; i++) {
+    boxes.push({
+      number: i,
+      emoji: getNumberEmoji(i),
+      isBomb: false,
+      isOpened: false,
+      openedBy: null
+    });
+  }
+  
+  // Place bomb randomly
+  const bombIndex = Math.floor(Math.random() * 9);
+  boxes[bombIndex].isBomb = true;
+  game.bombPosition = bombIndex + 1;
+  
+  game.boxes = boxes;
+  
+  await updateGameMessage(conn, groupId, game);
+  
+  // Start turn timer (40 seconds)
+  startTurnTimer(conn, groupId, game);
+}
+
+// ========== UPDATE GAME MESSAGE ==========
+async function updateGameMessage(conn, groupId, game) {
+  let teks = `💥 *ＢＯＯＭ ＧＡＭＥ* 💥\n\n`;
+  teks += `🎮 *Host:* @${game.host.split('@')[0]}\n`;
+  teks += `👥 *Players:*\n`;
+  teks += `   👤 @${game.players[0].id.split('@')[0]} vs 👤 @${game.players[1].id.split('@')[0]}\n\n`;
+  
+  teks += `━━━━━━━━━━━━━━━━━━\n`;
+  teks += `│  🎲 *CURRENT TURN*  │\n`;
+  teks += `━━━━━━━━━━━━━━━━━━\n\n`;
+  teks += `👑 *Turn:* @${game.currentTurn.split('@')[0]}\n`;
+  
+  // Calculate remaining time
+  const elapsed = Math.floor((Date.now() - game.turnStartTime) / 1000);
+  const remaining = Math.max(0, 40 - elapsed);
+  teks += `⏱️ *Time left:* ${remaining} seconds\n\n`;
+  
+  teks += `┌─────────────────┐\n`;
+  teks += `│  📦 *BOXES* 📦    │\n`;
+  teks += `└─────────────────┘\n\n`;
+  
+  // Show boxes (opened vs hidden)
+  teks += `╔═══════════════════╗\n`;
+  for (let i = 0; i < game.boxes.length; i += 3) {
+    let row = '║  ';
+    for (let j = 0; j < 3; j++) {
+      const box = game.boxes[i + j];
+      if (box.isOpened) {
+        row += box.isBomb ? '💥' : '✅';
+      } else {
+        row += box.emoji;
+      }
+      row += '  ';
+    }
+    teks += row + '║\n';
+  }
+  teks += `╚═══════════════════╝\n\n`;
+  
+  teks += `━━━━━━━━━━━━━━━━━━\n`;
+  teks += `│  📝 *INSTRUCTIONS* │\n`;
+  teks += `━━━━━━━━━━━━━━━━━━\n\n`;
+  teks += `✨ Send a *number 1-9* to open a box!\n`;
+  teks += `💀 If you get 💥 BOOM → You LOSE!\n`;
+  teks += `✅ Safe box → Continue!\n`;
+  teks += `🏆 Last player standing → WINNER!\n\n`;
+  
+  teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
+  
+  const mentions = [game.host, game.players[0].id, game.players[1].id, game.currentTurn];
+  
+  if (game.msgKey) {
+    await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions });
+  } else {
+    const msg = await reply(teks, { mentions });
+    game.msgKey = msg.key;
+  }
+}
+
+// ========== START TURN TIMER ==========
+function startTurnTimer(conn, groupId, game) {
+  if (game.timerInterval) clearInterval(game.timerInterval);
+  
+  game.timerInterval = setInterval(async () => {
+    const currentGame = activeGames.get(groupId);
+    if (!currentGame || currentGame.status !== 'playing') {
+      clearInterval(game.timerInterval);
+      return;
+    }
+    
+    const elapsed = Math.floor((Date.now() - currentGame.turnStartTime) / 1000);
+    const remaining = 40 - elapsed;
+    
+    if (remaining <= 0) {
+      // Time out - current player loses
+      clearInterval(currentGame.timerInterval);
+      
+      const loser = currentGame.currentTurn;
+      const winner = currentGame.players.find(p => p.id !== loser);
+      
+      currentGame.status = 'finished';
+      currentGame.winner = winner.id;
+      currentGame.loser = loser;
+      
+      let teks = `⏰ *ＴＩＭＥ ＯＵＴ！* ⏰\n\n`;
+      teks += `@${loser.split('@')[0]} took too long to choose!\n`;
+      teks += `💀 *${loser.split('@')[0]} loses by timeout!* 💀\n\n`;
+      teks += `━━━━━━━━━━━━━━━━━━\n`;
+      teks += `│  🏆 *ＧＡＭＥ ＯＶＥＲ* │\n`;
+      teks += `━━━━━━━━━━━━━━━━━━\n\n`;
+      teks += `🎉 *WINNER:* @${winner.id.split('@')[0]} 🎉\n`;
+      teks += `💀 *LOSER:* @${loser.split('@')[0]} 💀\n\n`;
+      teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
+      
+      await conn.sendMessage(groupId, { text: teks, edit: currentGame.msgKey, mentions: [loser, winner.id] });
+      activeGames.delete(groupId);
+    } else if (remaining <= 10) {
+      // Update message with remaining time (only update every 5 seconds to avoid spam)
+      if (remaining === 10 || remaining === 5 || remaining === 3 || remaining === 2 || remaining === 1) {
+        await updateGameMessage(conn, groupId, currentGame);
+      }
+    }
+  }, 1000);
+}
+
+// ========== HANDLE NUMBER SELECTION ==========
+// Add this to your message handler or create a separate command
+cmd({
+  pattern: "\\d+",
+  desc: "Select a box in Boom Game",
+  category: "fun",
+  filename: __filename
+}, async (conn, m, store, { reply, sender, react }) => {
+  try {
+    const groupId = m.key.remoteJid;
+    const game = activeGames.get(groupId);
+    
+    if (!game || game.status !== 'playing') return;
+    if (game.currentTurn !== sender) return;
+    
+    const number = parseInt(m.text);
+    if (isNaN(number) || number < 1 || number > 9) return;
+    
+    const box = game.boxes[number - 1];
+    
+    if (box.isOpened) {
+      await react("⚠️");
+      return reply(`❌ *Box ${number} is already opened!*\n\nChoose another box 🔄`);
+    }
+    
+    // Open the box
+    box.isOpened = true;
+    box.openedBy = sender;
+    
+    if (box.isBomb) {
+      // BOOM! Current player loses
+      clearInterval(game.timerInterval);
+      
+      const loser = sender;
+      const winner = game.players.find(p => p.id !== loser);
+      
+      game.status = 'finished';
+      game.winner = winner.id;
+      game.loser = loser;
+      
+      let teks = `💥 *ＢＯＯＭ！ ＥＸＰＬＯＳＩＯＮ！* 💥\n\n`;
+      teks += `@${loser.split('@')[0]} opened box ${number} and...\n`;
+      teks += `💣 *ＢＯＯＭ！* 💣\n\n`;
+      teks += `━━━━━━━━━━━━━━━━━━\n`;
+      teks += `│  🏆 *ＧＡＭＥ ＯＶＥＲ* │\n`;
+      teks += `━━━━━━━━━━━━━━━━━━\n\n`;
+      teks += `🎉 *WINNER:* @${winner.id.split('@')[0]} 🎉\n`;
+      teks += `💀 *LOSER:* @${loser.split('@')[0]} 💀\n\n`;
+      
+      teks += `╔═══════════════════╗\n`;
+      for (let i = 0; i < game.boxes.length; i += 3) {
+        let row = '║  ';
+        for (let j = 0; j < 3; j++) {
+          const b = game.boxes[i + j];
+          row += b.isBomb ? '💥' : (b.isOpened ? '✅' : b.emoji);
+          row += '  ';
+        }
+        teks += row + '║\n';
+      }
+      teks += `╚═══════════════════╝\n\n`;
+      
+      teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
+      
+      await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [loser, winner.id] });
+      activeGames.delete(groupId);
+      await react("💥");
+      
+    } else {
+      // Safe box - continue game
+      await react("✅");
+      
+      // Check if all safe boxes are opened (means other player already opened some)
+      const safeBoxes = game.boxes.filter(b => !b.isBomb);
+      const openedSafeBoxes = safeBoxes.filter(b => b.isOpened);
+      
+      if (openedSafeBoxes.length === safeBoxes.length) {
+        // All safe boxes opened - current player wins!
+        clearInterval(game.timerInterval);
+        
+        const winner = sender;
+        const loser = game.players.find(p => p.id !== winner);
+        
+        game.status = 'finished';
+        game.winner = winner.id;
+        game.loser = loser.id;
+        
+        let teks = `🎉 *ＶＩＣＴＯＲＹ！* 🎉\n\n`;
+        teks += `@${winner.split('@')[0]} opened the last safe box!\n`;
+        teks += `🏆 *WINNER:* @${winner.split('@')[0]} 🏆\n`;
+        teks += `💀 *LOSER:* @${loser.split('@')[0]} 💀\n\n`;
+        
+        teks += `╔═══════════════════╗\n`;
+        for (let i = 0; i < game.boxes.length; i += 3) {
+          let row = '║  ';
+          for (let j = 0; j < 3; j++) {
+            const b = game.boxes[i + j];
+            row += b.isBomb ? '💥' : '✅';
+            row += '  ';
+          }
+          teks += row + '║\n';
+        }
+        teks += `╚═══════════════════╝\n\n`;
+        teks += `💫 *ＢＹ: ＭＵＺＡＭＩＬ ＫＨＡＮ*`;
+        
+        await conn.sendMessage(groupId, { text: teks, edit: game.msgKey, mentions: [winner, loser] });
+        activeGames.delete(groupId);
+        return;
+      }
+      
+      // Switch turn to other player
+      const otherPlayer = game.players.find(p => p.id !== sender);
+      game.currentTurn = otherPlayer.id;
+      game.turnStartTime = Date.now();
+      
+      clearInterval(game.timerInterval);
+      startTurnTimer(conn, groupId, game);
+      await updateGameMessage(conn, groupId, game);
+    }
+    
+  } catch (error) {
+    console.error('Error in number selection:', error);
+  }
+});
+
+// ========== HELPER FUNCTION ==========
+function getNumberEmoji(num) {
+  const emojis = {
+    1: '1️⃣', 2: '2️⃣', 3: '3️⃣',
+    4: '4️⃣', 5: '5️⃣', 6: '6️⃣',
+    7: '7️⃣', 8: '8️⃣', 9: '9️⃣'
+  };
+  return emojis[num];
+}
 cmd({
     pattern: "pickupline",
     alias: ["pickup"],
@@ -198,7 +615,7 @@ async (conn, mek, m, { from, reply }) => {
         console.log('JSON response:', json);
 
         // Format the pickup line message
-        const pickupLine = `*Here's a pickup line for you:*\n\n"${json.pickupline}"\n\n> *BOSS-𝐌𝐃*`;
+        const pickupLine = `*Here's a pickup line for you:*\n\n"${json.pickupline}"\n\n> *MUZAMIL-XD*`;
 
         // Send the pickup line to the chat
         await conn.sendMessage(from, { text: pickupLine }, { quoted: m });

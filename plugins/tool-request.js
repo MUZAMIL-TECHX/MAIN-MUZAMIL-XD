@@ -26,7 +26,7 @@ cmd({
         const messageId = m.key.id;
 
         if (reportedMessages[messageId]) {
-            return reply("This report has already been forwarded to the owner. Please wait for a response.");
+            return reply("This report has already been forwarded to the Muzamil. Please wait for a response.");
         }
         reportedMessages[messageId] = true;
 

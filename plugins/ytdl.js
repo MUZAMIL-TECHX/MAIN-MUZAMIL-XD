@@ -54,7 +54,7 @@ cmd({
       author: _0x2356d
     } = _0x3b9c50.results[0x0];
     
-    let _0x206abf = "ZORAIB MD  WHATSAPP BOT„\n\n" + 
+    let _0x206abf = "MUZAMIL-XD  WHATSAPP BOT„\n\n" + 
       ("*Title:* " + (_0x417755 || "Unknown") + "\n") + 
       ("*Duration:* " + (_0x51f7d2 || 'Unknown') + "\n") + 
       ("*Views:* " + (_0x25a862 || 'Unknown') + "\n") + 
@@ -74,7 +74,7 @@ cmd({
     
     await _0x4be93c.sendMessage(_0x2c7589, {
       'react': {
-        'text': 'ZORAIB-MD',
+        'text': 'MUZAMIL-XD',
         'key': _0x2110e4.key
       }
     });

@@ -29,7 +29,7 @@ cmd({
         const video = search.videos[0];
 
         // 🎧 MP3 API (tumhari)
-        const apiUrl = `https://arslan-apis.vercel.app/download/ytmp3?url=${video.url}`;
+        const apiUrl = `https://dark-shan-yt.koyeb.app/download/ytmp3?url=${url}`;
         const res = await axios.get(apiUrl, { timeout: 60000 });
 
         if (
