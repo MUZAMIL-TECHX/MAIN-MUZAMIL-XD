@@ -5,7 +5,7 @@ const path = require('path');
 
 // ================== YOUTUBE VIDEO DOWNLOADER (Direct Video Send) ==================
 cmd({
-    pattern: "video",
+    pattern: "ytdl",
     alias: ["ytv", "youtube", "ytvideo", "yt"],
     react: "📥",
     desc: "Download YouTube videos (Direct Video Send)",
