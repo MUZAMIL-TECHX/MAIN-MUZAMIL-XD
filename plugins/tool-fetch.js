@@ -50,116 +50,86 @@ async (conn, mek, m, { from, args, q, reply, react }) => {
 
         await react("⏳");
 
-        // API call
+        // API call - FIXED: Use axios properly
+        const axios = require('axios');
         const apiUrl = `https://sim-info-api.wasif-ali.workers.dev/?search=${encodeURIComponent(q)}`;
-        const { data } = await axios.get(apiUrl);
+        const response = await axios.get(apiUrl);
+        const data = response.data;
 
-        // Check if data exists
-        if (!data.success || !data.records || data.records.length === 0) {
+        // Check if data exists - FIXED structure check
+        if (!data || !data.status || data.status !== "success") {
             await react("❌");
             return reply(`🔍 *No records found for:* \`${q}\``);
         }
 
-        const totalRecords = data.records.length;
-        const maxPerMessage = 3; // 3 records per message (avoid message too long)
-        const totalMessages = Math.ceil(totalRecords / maxPerMessage);
-        
-        // Function to format a single record
-        const formatRecord = (record, index) => {
-            return `
-┏━━━━━━━━━━━━━━━━━━━━━━┓
-┃  📱 *RECORD ${index}*  ┃
-┣━━━━━━━━━━━━━━━━━━━━━━┫
-┃ 👤 *NAME:* ${record.name || "N/A"}
-┃ 📞 *MOBILE:* ${record.mobile || "N/A"}
-┃ 🆔 *CNIC:* ${record.cnic || "N/A"}
-┃ 🏠 *ADDRESS:* ${record.address || "N/A"}
-┃ 📡 *NETWORK:* ${record.network || "N/A"}
-┃ ⏱️ *DATE:* ${record.date || "N/A"}
-┗━━━━━━━━━━━━━━━━━━━━━━┛`;
-        };
+        // Get records array - FIXED: Check different possible structures
+        let records = [];
+        if (data.records && Array.isArray(data.records) && data.records.length > 0) {
+            records = data.records;
+        } else if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+            records = data.data;
+        } else if (Array.isArray(data) && data.length > 0) {
+            records = data;
+        } else {
+            await react("❌");
+            return reply(`🔍 *No information found for:* \`${q}\``);
+        }
 
-        // Function to send formatted messages
-        const sendMessage = async (records, pageNum, isLastPage = false) => {
-            let recordsText = "";
-            records.forEach((record, idx) => {
-                recordsText += formatRecord(record, (pageNum - 1) * maxPerMessage + idx + 1);
-            });
-            
-            const header = `╭━━━━〔 📱 *SIM DATABASE* 〕━━━━━┈ ⊹
-┃ 🔍 *SEARCH:* \`${q}\`
-┃ 📊 *TOTAL RECORDS:* ${totalRecords}
-┃ 📄 *PAGE:* ${pageNum}/${totalMessages}
-┣━━━━━━━━━━━━━━━━━━━━━━┈ ⊹`;
-            
-            const footer = isLastPage ? `
-╰━━━━━━━━━━━━━━━━━━━━━━┈ ⊹
+        const totalRecords = records.length;
+        
+        // Format single message with all records
+        let resultText = `╭━━━━〔 📱 *SIM DATABASE* 〕━━━━━┈ ⊹\n`;
+        resultText += `┃ 🔍 *SEARCH:* \`${q}\`\n`;
+        resultText += `┃ 📊 *TOTAL RECORDS:* ${totalRecords}\n`;
+        resultText += `┣━━━━━━━━━━━━━━━━━━━━━━┈ ⊹\n\n`;
+
+        // Add each record
+        records.forEach((record, index) => {
+            resultText += `┏━━━━━━━━━━━━━━━━━━━━━━┓\n`;
+            resultText += `┃  📱 *RECORD ${index + 1}*  ┃\n`;
+            resultText += `┣━━━━━━━━━━━━━━━━━━━━━━┫\n`;
+            resultText += `┃ 👤 *NAME:* ${record.name || record.holder_name || "N/A"}\n`;
+            resultText += `┃ 📞 *MOBILE:* ${record.mobile || record.phone || "N/A"}\n`;
+            resultText += `┃ 🆔 *CNIC:* ${record.cnic || record.id_number || "N/A"}\n`;
+            resultText += `┃ 🏠 *ADDRESS:* ${record.address || record.location || "N/A"}\n`;
+            resultText += `┃ 📡 *NETWORK:* ${record.network || record.operator || "N/A"}\n`;
+            resultText += `┃ ⏱️ *DATE:* ${record.date || record.issue_date || "N/A"}\n`;
+            resultText += `┗━━━━━━━━━━━━━━━━━━━━━━┛\n\n`;
+        });
+
+        const footer = `╰━━━━━━━━━━━━━━━━━━━━━━┈ ⊹
 
 ┏━━━〔 ✨ *𝘿𝙀𝙑𝙀𝙇𝙊𝙋𝙀𝘿 𝘽𝙔* 〕━━━┓
 ┃    𝙈𝙐𝙕𝘼𝙈𝙄𝙇-𝙓𝘿 𝘿𝘼𝙏𝘼
 ┃    𝘽𝙔: 𝙈𝙐𝙕𝘼𝙈𝙄𝙇 𝙆𝙃𝘼𝙉
 ┗━━━━━━━━━━━━━━━━━━━━━━┛
 
-🌟 *Requested by:* ${m.pushName || "User"}` : `
-╰━━━━━━━━━━━━━━━━━━━━━━┈ ⊹
-📌 *Reply with next to see more records*`;
-            
-            const finalText = header + recordsText + footer;
-            
-            if (isLastPage) {
-                await conn.sendMessage(from, { text: finalText }, { quoted: mek });
-            } else {
-                await conn.sendMessage(from, { text: finalText }, { quoted: mek });
-                return true; // Indicates more pages available
-            }
-        };
+🌟 *Requested by:* ${m.pushName || "User"}`;
 
-        // Send first page
-        let currentPage = 1;
-        let startIdx = 0;
-        let endIdx = Math.min(maxPerMessage, totalRecords);
-        let currentRecords = data.records.slice(startIdx, endIdx);
-        
-        await sendMessage(currentRecords, currentPage, totalMessages === 1);
-        
-        // If more than one page, handle pagination
-        if (totalMessages > 1) {
-            // Store session for pagination
-            if (!global.simSessions) global.simSessions = {};
-            global.simSessions[m.sender] = {
-                data: data.records,
-                totalMessages: totalMessages,
-                maxPerMessage: maxPerMessage,
-                currentPage: 1,
-                query: q
-            };
-            
-            // Wait for user reply
-            const response = await conn.waitForMessage(from, m.sender, 30000);
-            if (response && response.body && response.body.toLowerCase() === "next") {
-                await react("⏩");
-                currentPage = 2;
-                startIdx = maxPerMessage;
-                endIdx = Math.min(maxPerMessage * 2, totalRecords);
-                currentRecords = data.records.slice(startIdx, endIdx);
-                await sendMessage(currentRecords, currentPage, currentPage === totalMessages);
-                await react("✅");
-            }
-        } else {
-            await react("✅");
-        }
+        resultText += footer;
+
+        // Send the complete message
+        await conn.sendMessage(from, { text: resultText }, { quoted: mek });
+        await react("✅");
         
     } catch (e) {
         console.error("SIM Data Error:", e);
         await react("❌");
         
         let errorMsg = "❌ *Error fetching SIM information!*\n\n";
-        if (e.response?.status === 400) {
-            errorMsg += "⚠️ *Invalid format!*\n📌 Use CNIC (without dashes) or mobile number";
-        } else if (e.response?.status === 404) {
-            errorMsg += "🔍 *No information found!*";
+        
+        if (e.response) {
+            if (e.response.status === 400) {
+                errorMsg += "⚠️ *Invalid format!*\n📌 Use CNIC (without dashes) or mobile number";
+            } else if (e.response.status === 404) {
+                errorMsg += "🔍 *No information found!*";
+            } else {
+                errorMsg += `🔄 *API Error ${e.response.status}*\n\`${e.response.statusText}\``;
+            }
+        } else if (e.request) {
+            errorMsg += "🌐 *Network error!*\nPlease check your internet connection";
         } else {
-            errorMsg += "🔄 *API error!*\n`" + e.message + "`";
+            errorMsg += "⚙️ *Internal error!*\n" + e.message;
         }
         
         reply(errorMsg);
