@@ -12,29 +12,29 @@ cmd({
 }, async (conn, mek, m, { from, reply }) => {
     try {
         const menuCaption = `╭━━━〔 *${config.BOT_NAME}* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 🌐 Botname : 𝙈𝙐𝙕𝘼𝙈𝙄𝙇-𝙓𝘿
+┃★╭──────────────────────────
+┃★│ 🌐 Botname : *${config.BOT_NAME}*
 ┃★│ 👑 Owner : *${config.OWNER_NAME}*
-┃★│ 🎭 Number : 923183928892
-┃★╰──────────────
+┃★╰──────────────────────────
 ╰━━━━━━━━━━━━━━━┈⊷
 ╭━━━❪ 📥 𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃 ❫━━━┈⊷
 ┃
 ┃ ★ 𝐌𝐄𝐃𝐈𝐀 & 𝐒𝐎𝐂𝐈𝐀𝐋 ★
 ┃
-┃ ✧ 📂 gdrive
+┃ ✧ 📂 gdrive <link>
 ┃ ✧ 🌐 yts
 ┃ ✧ 🌐 ytsearch <videoname>
 ┃ ✧ 🎬 ytvideo <link>
+┃ ✧ 🎬 video <link>
 ┃ ✧ 🎙songplay <link/name>
 ┃ ✧ 🎙playsong <link/name>
 ┃ ✧ 🎙splay <link/name>
-┃ ✧ 📱 apk
+┃ ✧ 📱 apk <name>
 ┃ ✧ 📱 apk2
 ┃ ✧ 💾 mfire
-┃ ✧ 💾 mediafire
+┃ ✧ 💾 mediafire <link>
 ┃ ✧ 🐦 twitter
-┃ ✧ 📸 ig7
+┃ ✧ 📸 ig <link>
 ┃ ✧ 📸 instagram2
 ┃ ✧ 📸 ig2
 ┃ ✧ 📸 igdl2
@@ -57,14 +57,16 @@ cmd({
 ┃ ✧ 🔍 tiktoksearch
 ┃ ✧ 📥 tiktokdl
 ┃ ✧ 📥 tiktok
-┃ ✧ 📥 tt2
+┃ ✧ 📥 tt <link>
 ┃ ✧ 📥 sss
+┃ ✧ 📸 reels <name>
+┃ ✧ 📸 short <name>
 ┃ ✧ 📌 pins
 ┃ ✧ 📌 pinterest
 ┃ ✧ 📌 pinterestdl
 ┃ ✧ 📌 pindl
 ┃ ✧ 🎬 playvideo
-┃ ✧ 🎬 video
+┃ ✧ 🎬 video <link>
 ┃ ✧ 🎬 video2
 ┃ ✧ 🎬 video3
 ┃ ✧ 🎬 video4
@@ -74,7 +76,7 @@ cmd({
 ┃ ✧ 🎬 video8
 ┃ ✧ 🎬 video9
 ┃ ✧ 🎬 video10
-┃ ✧ 🔍 ytsearch
+┃ ✧ 🔍 ytsearch <name>
 ┃ ✧ 🔍 yts
 ┃ ✧ ▶️ play
 ┃ ✧ ▶️ play2
@@ -221,19 +223,19 @@ cmd({
 ┃ ✧ 🔧 env
 ┃ ✧ 📥 get
 ┃ ✧ 🔑 gpass
-┃ ✧ 📨 autostatusreply
+┃ ✧ 📨 statusreply
 ┃ ✧ ❤️ autoreact
 ┃ ✧ 💬 autoreply
 ┃ ✧ 🎨 autosticker
 ┃ ✧ 🚫 antibadword
-┃ ✧ 👁️ autoread
-┃ ✧ 😊 status-react
+┃ ✧ 👁️ readmessage
+┃ ✧ 😊 statusreact
 ┃ ✧ 👀 autostatusview
-┃ ✧ 👀 auto-seen
-┃ ✧ 📹 autorecoding
+┃ ✧ 👀 statusseen
+┃ ✧ 📹 recoding
 ┃ ✧ 🌐 always-online
-┃ ✧ 💬 mention-reply
-┃ ✧ ⌨️ auto-typing
+┃ ✧ 💬 mentionreply
+┃ ✧ ⌨️ typing
 ┃ ✧ 🎮 setmode
 ┃ ✧ 🎮 mode
 ┃ ✧ 🔣 prefix
@@ -255,7 +257,7 @@ cmd({
 ┃ ✧ 👥 groupsprivacy
 ┃ ✧ 📝 updatebio
 ┃ ✧ ✏️ setmyname
-┃ ✧ 🟢 setonline
+┃ ✧ 🟢 online
 ┃ ✧ 🖼️ setppall
 ┃ ✧ 📝 getbio
 ┃ ✧ 🔒 privacymenu
@@ -324,9 +326,9 @@ cmd({
 ┃ ✧ 🎬 luma
 ┃ ✧ 🎵 dj
 ┃ ✧ 📚 khan
-┃ ✧ 🌐 createimg
-┃ ✧ 🗺️ nenobanana
-┃ ✧ 🗾 img
+┃ ✧ 🌐 createimg <prompt>
+┃ ✧ 🗺️ nenobanana <prompt>
+┃ ✧ 🗾 img <imgname>
 ┃
 ╰━━━━━━━━━━━━━━━━━━━━┈⊷
 ╭━━━❪ 🎎 𝐀𝐍𝐈𝐌𝐄 ❫━━━┈⊷
@@ -520,6 +522,11 @@ cmd({
 ┃ ✧ 😢 cry
 ┃ ✧ 🔪 kill
 ┃ ✧ 🔨 bonk
+┃ ✧ 🥵 fuck
+┃ ✧ 🥶 muth
+┃ ✧ 😨 fingering
+┃ ✧ 😩 sex
+┃ ✧ 💀 nikal
 ┃
 ╰━━━━━━━━━━━━━━━━━━━━┈⊷
 ┃
@@ -535,7 +542,9 @@ cmd({
 ┃ ✧ 🔄 restart
 ┃ ✧ 🎗 setdp
 ┃ ✧ 🎗 setname
-┃ ✧ 🎗 online
+┃ ✧ 🎗 online <on/off>
+┃ ✧ 🪙 autoread <on/off>
+┃ ✧ 🪙 autoreact <on/off>
 ┃
 ╰━━━━━━━━━━━━━━━━━━━━┈⊷
 > ${config.DESCRIPTION}`;
@@ -1238,7 +1247,7 @@ const menuData = {
                         await conn.sendMessage(
                             senderID,
                             {
-                                text: `❌ *Invalid Option!* ❌\n\nPlease reply with a number between 1-10 to select a menu.\n\n*Example:* Reply with "1" for Download Menu\n\n> ${config.DESCRIPTION}`,
+                                text: `*_Type .menu To See All Commands_*`,
                                 contextInfo: contextInfo
                             },
                             { quoted: receivedMsg }

@@ -12,7 +12,7 @@ const { writeFileSync } = require('fs');
 const path = require('path');
 
 cmd({
-    pattern: "admin-events",
+    pattern: "adminwelcome",
     alias: ["adminevents"],
     desc: "Enable or disable admin event notifications",
     category: "settings",
@@ -103,7 +103,7 @@ cmd({
 });
 
 cmd({
-    pattern: "auto-typing",
+    pattern: "typing",
     description: "Enable or disable auto-typing feature.",
     category: "settings",
     filename: __filename
@@ -124,7 +124,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 
 
 cmd({
-    pattern: "mention-reply",
+    pattern: "mentionreply",
     alias: ["menetionreply", "mee"],
     description: "Set bot status to always online or offline.",
     category: "settings",
@@ -137,10 +137,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Check the argument for enabling or disabling the anticall feature
     if (args[0] === "on") {
         config.MENTION_REPLY = "true";
-        return reply("Mention Reply feature is now enabled.");
+        return reply("Mention Reply feature is now enabled ✅.");
     } else if (args[0] === "off") {
         config.MENTION_REPLY = "false";
-        return reply("Mention Reply feature is now disabled.");
+        return reply("Mention Reply feature is now disabled. ✅");
     } else {
         return reply(`_example:  .mee on_`);
     }
@@ -151,7 +151,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 // ALWAYS_ONLINE COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "always-online",
+    pattern: "online",
     alias: ["alwaysonline"],
     desc: "Enable or disable the always online mode",
     category: "settings",
@@ -176,7 +176,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 //  AUTO_RECORDING COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "auto-recording",
+    pattern: "recording",
     alias: ["autorecoding"],
     description: "Enable or disable auto-recording feature.",
     category: "settings",
@@ -193,17 +193,17 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     config.AUTO_RECORDING = status === "on" ? "true" : "false";
     if (status === "on") {
         await conn.sendPresenceUpdate("recording", from);
-        return reply("Auto recording is now enabled. Bot is recording...");
+        return reply("Auto recording is now enabled. Bot is recording..✅.");
     } else {
         await conn.sendPresenceUpdate("available", from);
-        return reply("Auto recording has been disabled.");
+        return reply("Auto recording has been disabled.✅");
     }
 });
 //--------------------------------------------
 // AUTO_VIEW_STATUS COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "auto-seen",
+    pattern: "statusseen",
     alias: ["autostatusview"],
     desc: "Enable or disable auto-viewing of statuses",
     category: "settings",
@@ -216,10 +216,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Default value for AUTO_VIEW_STATUS is "false"
     if (args[0] === "on") {
         config.AUTO_STATUS_SEEN = "true";
-        return reply("Auto-viewing of statuses is now enabled.");
+        return reply("Auto-viewing of statuses is now enabled. ✅");
     } else if (args[0] === "off") {
         config.AUTO_STATUS_SEEN = "false";
-        return reply("Auto-viewing of statuses is now disabled.");
+        return reply("Auto-viewing of statuses is now disabled. ✅");
     } else {
         return reply(`*🫟 ᴇxᴀᴍᴘʟᴇ:  .ᴀᴜᴛᴏ-sᴇᴇɴ ᴏɴ*`);
     }
@@ -228,7 +228,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 // AUTO_LIKE_STATUS COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "status-react",
+    pattern: "statusreact",
     alias: ["statusreaction"],
     desc: "Enable or disable auto-liking of statuses",
     category: "settings",
@@ -241,10 +241,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Default value for AUTO_LIKE_STATUS is "false"
     if (args[0] === "on") {
         config.AUTO_STATUS_REACT = "true";
-        return reply("Auto-liking of statuses is now enabled.");
+        return reply("Auto-liking of statuses is now enabled. ✅");
     } else if (args[0] === "off") {
         config.AUTO_STATUS_REACT = "false";
-        return reply("Auto-liking of statuses is now disabled.");
+        return reply("Auto-liking of statuses is now disabled. ✅");
     } else {
         return reply(`Example: . status-react on`);
     }
@@ -254,7 +254,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 //  READ-MESSAGE COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "read-message",
+    pattern: "readmessage",
     alias: ["autoread"],
     desc: "enable or disable readmessage.",
     category: "settings",
@@ -267,10 +267,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Check the argument for enabling or disabling the anticall feature
     if (args[0] === "on") {
         config.READ_MESSAGE = "true";
-        return reply("readmessage feature is now enabled.");
+        return reply("readmessage feature is now enabled. ✅");
     } else if (args[0] === "off") {
         config.READ_MESSAGE = "false";
-        return reply("readmessage feature is now disabled.");
+        return reply("readmessage feature is now disabled. ✅");
     } else {
         return reply(`_example:  .readmessage on_`);
     }
@@ -282,7 +282,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 //  ANI-BAD COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "anti-bad",
+    pattern: "antibad",
     alias: ["antibadword"],
     desc: "enable or disable antibad.",
     category: "settings",
@@ -295,10 +295,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Check the argument for enabling or disabling the anticall feature
     if (args[0] === "on") {
         config.ANTI_BAD_WORD = "true";
-        return reply("*anti bad word is now enabled.*");
+        return reply("*anti bad word is now enabled ✅.*");
     } else if (args[0] === "off") {
         config.ANTI_BAD_WORD = "false";
-        return reply("*anti bad word feature is now disabled*");
+        return reply("*anti bad word feature is now disabled* ✅");
     } else {
         return reply(`_example:  .antibad on_`);
     }
@@ -307,9 +307,9 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 //  AUTO-STICKER COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "auto-sticker",
+    pattern: "autosticker",
     alias: ["autosticker"],
-    desc: "enable or disable auto-sticker.",
+    desc: "enable or disable auto-sticker ✅.",
     category: "settings",
     filename: __filename
 },    
@@ -320,10 +320,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Check the argument for enabling or disabling the anticall feature
     if (args[0] === "on") {
         config.AUTO_STICKER = "true";
-        return reply("auto-sticker feature is now enabled.");
+        return reply("auto-sticker feature is now enabled ✅.");
     } else if (args[0] === "off") {
         config.AUTO_STICKER = "false";
-        return reply("auto-sticker feature is now disabled.");
+        return reply("auto-sticker feature is now disabled ✅.");
     } else {
         return reply(`_example:  .auto-sticker on_`);
     }
@@ -371,10 +371,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Check the argument for enabling or disabling the anticall feature
     if (args[0] === "on") {
         config.AUTO_REACT = "true";
-        await reply("*autoreact feature is now enabled.*");
+        await reply("*autoreact feature is now enabled ✅.*");
     } else if (args[0] === "off") {
         config.AUTO_REACT = "false";
-        await reply("autoreact feature is now disabled.");
+        await reply("autoreact feature is now disabled ❌.");
     } else {
         await reply(`*🫟 ᴇxᴀᴍᴘʟᴇ: .ᴀᴜᴛᴏ-ʀᴇᴀᴄᴛ ᴏɴ*`);
     }
@@ -383,7 +383,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 //  STATUS-REPLY COMMANDS
 //--------------------------------------------
 cmd({
-    pattern: "status-reply",
+    pattern: "statusreply",
     alias: ["autostatusreply"],
     desc: "enable or disable status-reply.",
     category: "settings",
@@ -396,10 +396,10 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     // Check the argument for enabling or disabling the anticall feature
     if (args[0] === "on") {
         config.AUTO_STATUS_REPLY = "true";
-        return reply("status-reply feature is now enabled.");
+        return reply("status-reply feature is now enabled ✅.");
     } else if (args[0] === "off") {
         config.AUTO_STATUS_REPLY = "false";
-        return reply("status-reply feature is now disabled.");
+        return reply("status-reply feature is now disabled ❌.");
     } else {
         return reply(`*🫟 ᴇxᴀᴍᴘʟᴇ:  .sᴛᴀᴛᴜs-ʀᴇᴘʟʏ ᴏɴ*`);
     }

@@ -20,11 +20,9 @@ cmd({
 
 📌 *Usage:* 
 .video <YouTube URL>
-.video <video name>
 
 ✨ *Examples:* 
 .video https://youtu.be/abc123
-.video Diljit Dosanjh G.O.A.T
 
 ⚡ *Powered by MUZAMIL-XD*`);
         }
@@ -78,7 +76,7 @@ cmd({
         }
 
         // ========== DOWNLOAD VIDEO FROM DOWNLOAD URL ==========
-        reply("📥 *Downloading video from server...*\n⏱️ *Please wait (5MB video taking time)*");
+        reply("📥 *Muzamil-XD Downloading video from server...*\n⏱️ *Please wait *");
 
         const videoPath = path.join(__dirname, '../temp', `vid_${Date.now()}.mp4`);
         
@@ -117,9 +115,9 @@ cmd({
 │  ✦ *Size:* ${videoSizeMB} MB
 │  ✦ *Quality:* HD
 │  ✦ *API:* EliteProtech ⚡
-│  ✦ *Downloaded by:* *MUZAMIL KHAN*
+│  ✦ *Downloaded by:* *Muzamil Khan*
 ├─────────────────
-│  *𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 Μʋʓαмιℓ-ƵƉ*
+│  *Powered By: Muzamil-XD*
 ╰─────────────────⭓`;
 
         // ✅ DIRECT VIDEO BHEJ RAHA HAIN (SIRF LINK NAHI)
