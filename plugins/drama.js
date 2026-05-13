@@ -23,7 +23,7 @@ async function fetchVideo(url) {
 }
 
 cmd({
-    pattern: "drama",
+    pattern: "drama2",
     react: "🎬",
     desc: "Drama / YouTube download (video or document)",
     category: "download",
