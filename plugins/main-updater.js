@@ -1,171 +1,301 @@
-// update.js - MUZAMIL-XD Update System
+bot herkou and uskee api based vps prr deploy h firr? sahe h?
+
+// MUZAMIL-XD/Plugins/update.js - PRODUCTION FINAL
 const { cmd } = require("../command");
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
+// 🔒 HARDLOCK - SIRF TERA NUMBER
+const ONLY_OWNER = "923183928892";
+const BACKUP_DIR = path.join(process.cwd(), '..', 'muzamil_backup_' + Date.now());
+const LOG_FILE = path.join(process.cwd(), 'update_log.txt');
+
+// ✅ CHECK INTERNET WITH AXIOS (WORKS EVERYWHERE)
+async function checkInternet() {
+try {
+await axios.get("https://www.google.com", { timeout: 5000 });
+return true;
+} catch {
+return false;
+}
+}
+
+// ✅ CHECK GITHUB REACHABLE WITH API (WORKS EVERYWHERE)
+async function checkGitHub() {
+try {
+await axios.get("https://api.github.com", { timeout: 5000 });
+return true;
+} catch {
+return false;
+}
+}
+
+// ✅ CHECK UNZIP INSTALLED
+function checkUnzipInstalled() {
+return new Promise((resolve) => {
+exec('command -v unzip', (err) => {
+resolve(!err);
+});
+});
+}
+
 cmd({
-    pattern: "update",
-    alias: ["upgrade", "refresh", "renew"],
-    react: '🔄',
-    desc: "Update MUZAMIL-XD to latest version (Owner Only)",
-    category: "owner",
-    filename: __filename
-}, async (client, message, match, { from, isCreator }) => {
-    
-    try {
-        // 🔒 OWNER ONLY CHECK
-        if (!isCreator) {
-            return await client.sendMessage(from, {
-                text: `╭━━━━━━━━━━━━━━━⬣
-┃❌ *ACCESS DENIED!*
-┃━━━━━━━━━━━━━━━
-┃👤 *Status:* Unauthorized
-┃⚠️ *Warning:* This Action Will Be Reported
-┃━━━━━━━━━━━━━━━
-┃🔒 *Only Muzamil Can Do This!*
-┃👑 *Contact Owner:* wa.me/923183928892
-┃📛 *Don't Try Again!*
-╰━━━━━━━━━━━━━━━⬣
+pattern: "update",
+alias: ["upgrade", "refresh", "renew"],
+react: '🔄',
+desc: "Update MUZAMIL-XD (Owner Only) - Production Grade",
+category: "owner",
+filename: __filename
+}, async (client, message, match, { from }) => {
 
-> © MUZAMIL-XD BOT • All Rights Reserved`,
-                contextInfo: {
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363304633358907@newsletter',
-                        newsletterName: 'MUZAMIL-XD 🔥',
-                        serverMessageId: 69
-                    }
-                }
-            }, { quoted: message });
-        }
-
-        // ✅ OWNER CONFIRMED - ATTITUDE MODE ON
-        await client.sendMessage(from, {
+try {  
+    // 🔒 FIX 1: GROUPS ME OWNER CHECK 100% WORKING  
+    // Old: const sender = message.key?.participant || message.key?.remoteJid || from;  
+    // Old: const senderNum = sender.split('@')[0];  
+      
+    // ✅ NEW: Sirf numbers extract karo - group + private dono mein kaam karega  
+    const senderRaw = message.key?.participant || message.key?.remoteJid || from;  
+    const senderNum = senderRaw.replace(/[^0-9]/g, ""); // Sirf numbers chahiye  
+      
+    if (senderNum !== ONLY_OWNER) {  
+        await client.sendMessage(from, {  
             text: `╭━━━━━━━━━━━━━━━⬣
-┃✅ *ACCESS GRANTED!*
+
+┃❌ ACCESS DENIED!
 ┃━━━━━━━━━━━━━━━
-┃👑 *Welcome Boss!*
-┃👤 *Owner:* MUZAMIL KHAN
-┃⚡ *Bot:* MUZAMIL-XD v15.0
+┃⚠️ Owner Only Command
+┃🔒 This Action Has Been Logged
 ┃━━━━━━━━━━━━━━━
-┃🔄 *Initiating Update Sequence...*
-┃📡 *Status:* Connecting to GitHub
-┃⏳ *ETA:* 1-2 Minutes
+┃👑 Contact Owner
+┃📞 For Assistance
 ╰━━━━━━━━━━━━━━━⬣
 
-> ⚡ *MUZAMIL-XD UPDATER • Power By Team RedX*`
-        }, { quoted: message });
+> © MUZAMIL-XD BOT • Production Protected`
+});
 
-        const ZIP_URL = 'https://github.com/MUZAMIL-TECHX/MAIN-MUZAMIL-XD/archive/refs/heads/main.zip';
-        const isGit = fs.existsSync(path.join(process.cwd(), '.git'));
 
-        if (isGit) {
-            // 🔥 GIT METHOD - ELITE WAY
-            await client.sendMessage(from, {
-                text: `╭━━━━━━━━━━━━━━━⬣
-┃📡 *GIT MODE ACTIVATED*
+
+fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] UNAUTHORIZED: ${senderNum}\n`);  
+        return;  
+    }  
+      
+    // ✅ OWNER VERIFIED  
+    await client.sendMessage(from, {  
+        text: `╭━━━━━━━━━━━━━━━⬣
+
+┃✅ ACCESS GRANTED
 ┃━━━━━━━━━━━━━━━
-┃🔗 *Repo:* MUZAMIL-TECHX/MAIN-MUZAMIL-XD
-┃🌿 *Branch:* Main
-┃⚡ *Status:* Fetching Updates...
-╰━━━━━━━━━━━━━━━⬣`
-            }, { quoted: message });
+┃👑 Welcome Boss @${ONLY_OWNER}
+┃🔄 Initializing Update
+┃📦 Creating Lightweight Backup...
+┃🌐 Checking Internet...
+╰━━━━━━━━━━━━━━━⬣,   mentions: [${ONLY_OWNER}@s.whatsapp.net`]
+});
 
-            exec('git pull origin main', async (error, stdout, stderr) => {
-                if (error) {
-                    await client.sendMessage(from, {
-                        text: `⚠️ *Git Mode Failed!*\n🔄 *Switching to ZIP Mode...*`
-                    }, { quoted: message });
-                    await updateViaZip(client, from, message, ZIP_URL);
-                    return;
-                }
+// 🌐 CHECK INTERNET  
+    const isOnline = await checkInternet();  
+    if (!isOnline) {  
+        await client.sendMessage(from, {  
+            text: `❌ *No Internet Connection!*\n📡 *Please check your network*\n🔄 *Try again later*`  
+        });  
+        return;  
+    }  
+      
+    // 📡 CHECK GITHUB REACHABLE  
+    const isGitHubReachable = await checkGitHub();  
+    if (!isGitHubReachable) {  
+        await client.sendMessage(from, {  
+            text: `⚠️ *GitHub is not reachable!*\n🔄 *Check your connection*\n📞 *Try again later*`  
+        });  
+        return;  
+    }  
+      
+    await client.sendMessage(from, { text: '✅ *Internet & GitHub Reachable*' });  
+      
+    // ✅ FIX 2: CHECK UNZIP INSTALLED BEFORE ZIP UPDATE  
+    const hasUnzip = await checkUnzipInstalled();  
+    if (!hasUnzip) {  
+        await client.sendMessage(from, {  
+            text: `❌ *unzip command not installed on server!*\n📦 *Please install: apt install unzip -y*\n🔄 *Use Git method instead*`  
+        });  
+        // Try Git method even if no unzip  
+        const isGit = fs.existsSync(path.join(process.cwd(), '.git'));  
+        if (!isGit) {  
+            return;  
+        }  
+    }  
+      
+    // 📦 CREATE BACKUP WITH RSYNC  
+    const escapedCwd = `"${process.cwd()}"`;  
+    const escapedBackup = `"${BACKUP_DIR}"`;  
+      
+    exec('command -v rsync', async (rsyncErr) => {  
+        let backupCmd;  
+        if (!rsyncErr) {  
+            backupCmd = `rsync -a --exclude=node_modules --exclude=.git --exclude=tmp --exclude=sessions "${process.cwd()}/" "${BACKUP_DIR}"`;  
+            await client.sendMessage(from, { text: '📦 *Creating optimized backup (rsync)...*' });  
+        } else {  
+            backupCmd = `cp -r ${escapedCwd} ${escapedBackup}`;  
+            await client.sendMessage(from, { text: '📦 *Creating backup (cp fallback)...*' });  
+        }  
+          
+        exec(backupCmd, async (backupErr) => {  
+            if (backupErr) {  
+                await client.sendMessage(from, { text: '⚠️ Backup failed but continuing...' });  
+                fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] BACKUP FAILED: ${backupErr.message}\n`);  
+            } else {  
+                await client.sendMessage(from, { text: '✅ Lightweight backup created!' });  
+                fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] BACKUP SUCCESS: ${BACKUP_DIR}\n`);  
+            }  
+              
+            await performUpdate(client, from, message);  
+        });  
+    });  
+      
+    async function performUpdate(client, from, message) {  
+        const ZIP_URL = 'https://github.com/MUZAMIL-TECHX/MAIN-MUZAMIL-XD/archive/refs/heads/main.zip';  
+        const isGit = fs.existsSync(path.join(process.cwd(), '.git'));  
+          
+        if (isGit) {  
+            await client.sendMessage(from, { text: '📡 *Git Mode Activated*' });  
+            exec('git pull origin main', async (error, stdout, stderr) => {  
+                if (error) {  
+                    await client.sendMessage(from, { text: '⚠️ Git failed! Trying ZIP...' });  
+                    await updateViaZip(client, from, message, ZIP_URL);  
+                    return;  
+                }  
+                  
+                let msg = '✅ *Update Done!*\n```' + (stdout.slice(0, 150) || 'Updated') + '```';  
+                fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] GIT PULL: ${stdout}\n`);  
+                  
+                if (stdout.includes('package.json')) {  
+                    await client.sendMessage(from, { text: msg + '\n\n📦 Installing dependencies...' });  
+                    // ✅ FIX 3: FASTER NPM INSTALL  
+                    exec('npm install --force --omit=dev --no-audit --no-fund', () => {  
+                        finalizeUpdate(client, from, message);  
+                    });  
+                } else {  
+                    await client.sendMessage(from, { text: msg + '\n\n🔄 Finalizing...' });  
+                    finalizeUpdate(client, from, message);  
+                }  
+            });  
+        } else {  
+            await updateViaZip(client, from, message, ZIP_URL);  
+        }  
+    }  
+      
+    // 📦 ZIP UPDATE WITH UNZIP CHECK  
+    async function updateViaZip(client, from, message, zipUrl) {  
+        try {  
+            // Double check unzip  
+            const hasUnzipAgain = await checkUnzipInstalled();  
+            if (!hasUnzipAgain) {  
+                await client.sendMessage(from, { text: '❌ *unzip not installed! Cannot proceed.*' });  
+                return;  
+            }  
+              
+            await client.sendMessage(from, { text: '📥 Downloading latest files...' });  
+              
+            const response = await axios({  
+                method: 'get',  
+                url: zipUrl,  
+                responseType: 'arraybuffer',  
+                timeout: 90000  
+            });  
+              
+            const zipPath = path.join(process.cwd(), 'temp_update.zip');  
+            fs.writeFileSync(zipPath, response.data);  
+              
+            await client.sendMessage(from, { text: '📦 Extracting files...' });  
+              
+            const escapedZip = `"${zipPath}"`;  
+            exec(`unzip -o ${escapedZip} -d ./temp_folder && cp -rf ./temp_folder/MAIN-MUZAMIL-XD-main/. . && rm -rf ./temp_folder ${escapedZip}`, async (err) => {  
+                if (err) {  
+                    await client.sendMessage(from, { text: '❌ Extract failed! Rolling back...' });  
+                    fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] EXTRACT FAILED: ${err.message}\n`);  
+                    await rollbackUpdate(client, from, message);  
+                    return;  
+                }  
+                  
+                if (fs.existsSync('./package.json')) {  
+                    await client.sendMessage(from, { text: '📦 Installing dependencies...' });  
+                    // ✅ FIX 3: FASTER NPM INSTALL  
+                    exec('npm install --force --omit=dev --no-audit --no-fund', () => {  
+                        finalizeUpdate(client, from, message);  
+                    });  
+                } else {  
+                    finalizeUpdate(client, from, message);  
+                }  
+            });  
+        } catch (error) {  
+            await client.sendMessage(from, { text: '❌ Update failed! Rolling back...' });  
+            fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] ZIP FAILED: ${error.message}\n`);  
+            await rollbackUpdate(client, from, message);  
+        }  
+    }  
+      
+    // 🔄 FINALIZE UPDATE  
+    async function finalizeUpdate(client, from, message) {  
+        await client.sendMessage(from, {  
+            text: `╭━━━━━━━━━━━━━━━⬣
 
-                let changes = stdout.trim() || 'No changes detected';
-                let updateMsg = `╭━━━━━━━━━━━━━━━⬣\n┃✅ *UPDATE SUCCESSFUL!*\n┃━━━━━━━━━━━━━━━\n┃📊 *Changes:*\n┃${changes.slice(0, 150)}\n╰━━━━━━━━━━━━━━━⬣`;
+┃✅ UPDATE COMPLETE!
+┃━━━━━━━━━━━━━━━
+┃🔄 Restarting MUZAMIL-XD
+┃📞 Back Online In 30 Sec
+┃💬 Type .alive to Check
+┃━━━━━━━━━━━━━━━
+┃🔥 Version: 15.0.0
+┃👑 Owner: MUZAMIL KHAN
+┃🛡️ Build: Production Final
+╰━━━━━━━━━━━━━━━⬣
 
-                if (stdout.includes('package.json')) {
-                    await client.sendMessage(from, {
-                        text: updateMsg + `\n\n📦 *Installing Dependencies...*\n⏳ Please wait...`
-                    }, { quoted: message });
-                    
-                    exec('npm install', async (npmErr) => {
-                        await client.sendMessage(from, {
-                            text: `╭━━━━━━━━━━━━━━━⬣\n┃✅ *FINAL STEP COMPLETE!*\n┃━━━━━━━━━━━━━━━\n┃🔄 *Restarting MUZAMIL-XD...*\n┃📞 *Back Online In 30 Seconds*\n┃💬 *Type .alive to Check*\n╰━━━━━━━━━━━━━━━⬣\n\n> 🔥 *MUZAMIL-XD • The Beast Bot*`
-                        }, { quoted: message });
-                        setTimeout(() => process.exit(0), 3000);
-                    });
-                } else {
-                    await client.sendMessage(from, {
-                        text: updateMsg + `\n\n╭━━━━━━━━━━━━━━━⬣\n┃🔄 *Restarting MUZAMIL-XD...*\n┃📞 *Back Online In 30 Seconds*\n┃💬 *Type .alive to Check*\n╰━━━━━━━━━━━━━━━⬣\n\n> 👑 *MUZAMIL-XD • King of Bots*`
-                    }, { quoted: message });
-                    setTimeout(() => process.exit(0), 3000);
-                }
-            });
-        } else {
-            await updateViaZip(client, from, message, ZIP_URL);
-        }
+> ⚡ MUZAMIL-XD • Enterprise Edition`
+});
 
-        // 📦 ZIP UPDATE FUNCTION
-        async function updateViaZip(client, from, message, zipUrl) {
-            try {
-                await client.sendMessage(from, {
-                    text: `╭━━━━━━━━━━━━━━━⬣\n┃📡 *ZIP MODE ACTIVATED*\n┃━━━━━━━━━━━━━━━\n┃📥 *Downloading Files...*\n┃🔗 *Source:* GitHub Latest\n╰━━━━━━━━━━━━━━━⬣`
-                }, { quoted: message });
 
-                const response = await axios({
-                    method: 'get',
-                    url: zipUrl,
-                    responseType: 'arraybuffer',
-                    timeout: 90000
-                });
 
-                const zipPath = path.join(process.cwd(), 'temp_muzamil_update.zip');
-                fs.writeFileSync(zipPath, response.data);
+fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] UPDATE SUCCESS\n`);  
+          
+        // Cleanup old backup (keep latest 3)  
+        exec(`ls -t ../muzamil_backup_* 2>/dev/null | tail -n +4 | xargs -I {} rm -rf "{}" 2>/dev/null || true`);  
+          
+        setTimeout(() => {  
+            process.exit(0);  
+        }, 2500);  
+    }  
+      
+    // 🔄 ROLLBACK SYSTEM  
+    async function rollbackUpdate(client, from, message) {  
+        await client.sendMessage(from, {  
+            text: `⚠️ *UPDATE FAILED!*
 
-                await client.sendMessage(from, {
-                    text: `📦 *Extracting Files...*\n⚙️ *Processing Update...*`
-                }, { quoted: message });
+🔄 Initiating Rollback...
+📦 Restoring from lightweight backup...`
+});
 
-                exec(`unzip -o ${zipPath} -d ./temp_muzamil && cp -rf ./temp_muzamil/MAIN-MUZAMIL-XD-main/* . && rm -rf ./temp_muzamil ${zipPath}`, async (err) => {
-                    if (err) {
-                        await client.sendMessage(from, {
-                            text: `❌ *Extraction Failed!*\n\`\`\`${err.message}\`\`\`\n\n⚠️ *Try Manual Update From GitHub*`
-                        }, { quoted: message });
-                        return;
-                    }
+const escapedBackup = `"${BACKUP_DIR}"`;  
+        exec(`cp -rf ${escapedBackup}/. . && rm -rf ${escapedBackup}`, async (rollbackErr) => {  
+            if (rollbackErr) {  
+                await client.sendMessage(from, {  
+                    text: `❌ *CRITICAL!*
 
-                    if (fs.existsSync('./package.json')) {
-                        await client.sendMessage(from, {
-                            text: `📦 *Installing Dependencies...*\n⏳ *Running npm install...*`
-                        }, { quoted: message });
-                        
-                        exec('npm install', async () => {
-                            await client.sendMessage(from, {
-                                text: `╭━━━━━━━━━━━━━━━⬣\n┃✅ *UPDATE COMPLETE!*\n┃━━━━━━━━━━━━━━━\n┃🔄 *Restarting MUZAMIL-XD...*\n┃📞 *Back Online In 30 Seconds*\n┃💬 *Type .alive to Check*\n┃━━━━━━━━━━━━━━━\n┃🔥 *Version:* 15.0.0\n┃👑 *Owner:* MUZAMIL KHAN\n╰━━━━━━━━━━━━━━━⬣\n\n> ⚡ *MUZAMIL-XD • The Ultimate WhatsApp Bot*`
-                            }, { quoted: message });
-                            setTimeout(() => process.exit(0), 3000);
-                        });
-                    } else {
-                        await client.sendMessage(from, {
-                            text: `╭━━━━━━━━━━━━━━━⬣\n┃✅ *UPDATE COMPLETE!*\n┃━━━━━━━━━━━━━━━\n┃🔄 *Restarting MUZAMIL-XD...*\n┃📞 *Back Online In 30 Seconds*\n┃💬 *Type .alive to Check*\n╰━━━━━━━━━━━━━━━⬣\n\n> 🚀 *MUZAMIL-XD • Power By Team RedX*`
-                        }, { quoted: message });
-                        setTimeout(() => process.exit(0), 3000);
-                    }
-                });
-            } catch (error) {
-                await client.sendMessage(from, {
-                    text: `❌ *Update Failed!*\n\`\`\`${error.message}\`\`\`\n\n📌 *Check Internet Connection*\n🔄 *Try Again After Some Time*`
-                }, { quoted: message });
-            }
-        }
+⚠️ Manual intervention needed
+📞 Contact: wa.me/${ONLY_OWNER}  });   fs.appendFileSync(LOG_FILE,[${new Date().toISOString()}] ROLLBACK FAILED: ${rollbackErr.message}\n);   } else {   await client.sendMessage(from, {   text: ✅ Rollback Successful!
+🔄 Restarting previous version...  });   fs.appendFileSync(LOG_FILE,[${new Date().toISOString()}] ROLLBACK SUCCESS\n`);
+setTimeout(() => process.exit(0), 2000);
+}
+});
+}
 
-    } catch (err) {
-        console.error('Update Error:', err);
-        await client.sendMessage(from, {
-            text: `❌ *System Error!*\n\`\`\`${err.message}\`\`\`\n\n⚠️ *Contact Developer:* wa.me/923183928892`
-        }, { quoted: message });
-    }
+} catch (err) {  
+    console.error('Update Error:', err);  
+    fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] CRITICAL ERROR: ${err.message}\n`);  
+    await client.sendMessage(from, {  
+        text: `❌ *System Error!*\n\`\`\`${err.message}\`\`\`\n📞 *Contact: wa.me/${ONLY_OWNER}*`  
+    });  
+}
+
 });
