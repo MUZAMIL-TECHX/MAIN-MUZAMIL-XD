@@ -19,15 +19,7 @@ cmd({
 │ • ⚙️ Prefix: [${config.PREFIX}]
 │ • 🌐 Platform: Heroku
 │ • 📦 Version: 4.0.0
-│ • 🕒 Runtime: ${runtime(process.uptime())}
-│
-│ *📊 COMMAND STATS*
-│ • 📜 Total Commands: ${totalCommands}
-│ • 🔄 Total Aliases: ${aliasCount}
-│ • 🗂️ Categories: ${categories.length}
-│
-╰────────────────⳹\n
-
+╰────────────────⳹
 ╰━━━━━━━━━━━━━━━┈⊷
 ╭━━━❪ 📥 𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃 ❫━━━┈⊷
 ┃

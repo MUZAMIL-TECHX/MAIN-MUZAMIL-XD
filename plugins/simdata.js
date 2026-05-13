@@ -3,7 +3,7 @@ const { fetchJson } = require('../lib/functions');
 
 cmd({
     pattern: "sim",
-    alias: ["siminfo", "simdata"],
+    alias: ["siminfo", "simdata", "simdb"],
     desc: "Get SIM card information for any number",
     category: "main",
     react: "📱",
@@ -14,90 +14,115 @@ async (conn, mek, m, { from, quoted, body, args, reply }) => {
         const number = args[0]?.trim();
         
         if (!number) {
-            return reply(`📱 *SIM INFORMATION TOOL*\n\nExample: *.sim 31××××××××*\n\nGet SIM card details for any Pakistani number.`);
+            const helpMsg = `🎀 *━━━━━━━ SIM DATABASE ━━━━━━━* 🎀
+            
+┏━━━━━━━━━━━━━━━━━━━━┓
+┃  📱 SIM INFO TOOL   ┃
+┗━━━━━━━━━━━━━━━━━━━━┛
+
+✨ *Usage:* .sim 31xxxxxxxx
+
+📌 *Example:* .sim 3123456789
+
+🌸 *Features:*
+├─👉 Owner Details
+├─👉 CNIC Info  
+├─👉 Address
+└─👉 Network Provider
+
+🎀 *BY: MUZAMIL KHAN* 🎀`;
+            return reply(helpMsg);
         }
 
-        // Remove leading zero or +92 if present
         let cleanNumber = number.replace(/^\+92/, '').replace(/^0/, '');
         
-        // Validate number
-        if (!/^\d+$/.test(cleanNumber)) {
-            return reply('❌ Please provide a valid phone number.');
+        if (!/^\d+$/.test(cleanNumber) || cleanNumber.length < 10) {
+            return reply(`❌ *INVALID NUMBER!*\n\nPlease enter valid Pakistani number.\nExample: *3123456789*`);
         }
 
-        // Use the working API
+        // Loading message
+        const loadingMsg = await conn.sendMessage(from, {
+            text: `🔍 *SEARCHING DATABASE* 🔍\n\n┏━━━━━━━━━━━━━━━━━━━━┓\n┃ 📡 Checking: +92${cleanNumber}\n┃ ⏳ Please wait...\n┗━━━━━━━━━━━━━━━━━━━━┛`
+        }, { quoted: mek });
+
         const apiUrl = `https://sim-info-api.wasif-ali.workers.dev/?search=${cleanNumber}`;
         
         let response;
         try {
             response = await fetchJson(apiUrl);
         } catch (err) {
-            return reply(`❌ API Error: ${err.message || 'Failed to fetch SIM information'}`);
+            await conn.sendMessage(from, { delete: loadingMsg.key });
+            return reply(`⚠️ *API ERROR*\n\n❌ ${err.message || 'Connection failed'}\n\n🔄 Try again later.`);
         }
 
-        if (!response || !response.success) {
-            return reply(`❌ No information found for number: ${number}`);
+        if (!response || !response.success || response.records.length === 0) {
+            await conn.sendMessage(from, { delete: loadingMsg.key });
+            return reply(`📭 *NO DATA FOUND*\n\n🔍 Number: +92${cleanNumber}\n\n💔 No records available.`);
         }
 
-        // Build beautiful response with all records
-        let resultText = `╭━━━━━━━━━━━━━━━━━━━━╮\n`;
-        resultText += `┃ 📱 *SIM CARD DATA* ┃\n`;
-        resultText += `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+        await conn.sendMessage(from, { delete: loadingMsg.key });
+
+        let resultText = `🎀 *━━━━━━━ SIM CARD DATA ━━━━━━━* 🎀\n\n`;
+        resultText += `📱 *NUMBER:* +92${cleanNumber}\n`;
+        resultText += `📊 *TOTAL:* ${response.records.length} Record(s)\n`;
+        resultText += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
         
-        // Show all records
+        // SAME BOX DESIGN FOR EVERY RECORD
         for (let i = 0; i < response.records.length; i++) {
             const record = response.records[i];
-            resultText += `┌────────────────────┐\n`;
-            resultText += `│ 📍 *RECORD ${i + 1}*       │\n`;
-            resultText += `└────────────────────┘\n`;
-            resultText += `┌────────────────────┐\n`;
-            resultText += `│ 👤 *NAME*           │\n`;
-            resultText += `│ ${record.name || 'N/A'}\n`;
-            resultText += `└────────────────────┘\n`;
-            resultText += `┌────────────────────┐\n`;
-            resultText += `│ 📞 *MOBILE*         │\n`;
-            resultText += `│ ${record.mobile || cleanNumber}\n`;
-            resultText += `└────────────────────┘\n`;
-            resultText += `┌────────────────────┐\n`;
-            resultText += `│ 🆔 *CNIC*           │\n`;
-            resultText += `│ ${record.cnic || 'N/A'}\n`;
-            resultText += `└────────────────────┘\n`;
-            resultText += `┌────────────────────┐\n`;
-            resultText += `│ 🏠 *ADDRESS*        │\n`;
-            resultText += `│ ${record.address || 'Address not available'}\n`;
-            resultText += `└────────────────────┘\n`;
-            resultText += `┌────────────────────┐\n`;
-            resultText += `│ 📡 *NETWORK*        │\n`;
-            resultText += `│ ${record.network || 'N/A'}\n`;
-            resultText += `└────────────────────┘\n\n`;
+            
+            // Record Header
+            resultText += `┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n`;
+            resultText += `┃  📇 RECORD ${i + 1} - CARD DATA  ┃\n`;
+            resultText += `┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n`;
+            
+            // Main Content Box
+            resultText += `┌────────────────────────────────┐\n`;
+            resultText += `│ 👤 *NAME*                        │\n`;
+            resultText += `│ ${record.name || 'N/A'}│\n`;
+            resultText += `├────────────────────────────────┤\n`;
+            resultText += `│ 🆔 *CNIC*                        │\n`;
+            resultText += `│ ${record.cnic || 'N/A'}│\n`;
+            resultText += `├────────────────────────────────┤\n`;
+            resultText += `│ 📞 *SIM NUMBER*                  │\n`;
+            resultText += `│ ${record.mobile || cleanNumber}│\n`;
+            resultText += `├────────────────────────────────┤\n`;
+            resultText += `│ 🏠 *ADDRESS*                     │\n`;
+            resultText += `│ ${record.address || 'N/A'}│\n`;
+            resultText += `├────────────────────────────────┤\n`;
+            resultText += `│ 📡 *NETWORK*                     │\n`;
+            resultText += `│ ${record.network || 'Unknown'}│\n`;
+            resultText += `└────────────────────────────────┘\n`;
+            
+            // Separator between records (except last one)
+            if (i < response.records.length - 1) {
+                resultText += `\n🌸 *━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━* 🌸\n\n`;
+            }
         }
         
-        // Add developer info
-        resultText += `╭━━━━━━━━━━━━━━━━━━━━╮\n`;
-        resultText += `┃ ℹ️ *INFO*           ┃\n`;
-        resultText += `╰━━━━━━━━━━━━━━━━━━━━╯\n`;
-        resultText += `┌────────────────────┐\n`;
-        resultText += `│ 👨‍💻 *Developer*     │\n`;
-        resultText += `│ ${response.developer || 'MUZAMIL-XD'}\n`;
-        resultText += `└────────────────────┘\n`;
-        resultText += `┌────────────────────┐\n`;
-        resultText += `│ 📱 *Telegram*       │\n`;
-        resultText += `│ ${response.telegram || '@TeamRedXhacker1'}\n`;
-        resultText += `└────────────────────┘\n`;
-        resultText += `┌────────────────────┐\n`;
-        resultText += `│ 📢 *Channel*        │\n`;
-        resultText += `│ ${response.channel || 'https://whatsapp.com/channel/0029VbCkm3rAe5VzCYLtNb2u'}\n`;
-        resultText += `└────────────────────┘\n\n`;
+        // ONLY YOUR CREDIT
+        resultText += `\n┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n`;
+        resultText += `┃ 💝 *CREDIT & SUPPORT* 💝       ┃\n`;
+        resultText += `┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n`;
         
-        // Total records count
-        resultText += `╭━━━━━━━━━━━━━━━━━━━━╮\n`;
-        resultText += `┃ 📊 *TOTAL RECORDS: ${response.count || response.records.length}* ┃\n`;
-        resultText += `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+        resultText += `┌────────────────────────────────┐\n`;
+        resultText += `│ 👨‍💻 *DEVELOPER*                  │\n`;
+        resultText += `│ ✨ MUZAMIL KHAN ✨              │\n`;
+        resultText += `├────────────────────────────────┤\n`;
+        resultText += `│ 📢 *WHATSAPP CHANNEL*           │\n`;
+        resultText += `│ https://whatsapp.com/channel/  │\n`;
+        resultText += `│ 0029VbCkm3rAe5VzCYLtNb2u      │\n`;
+        resultText += `├────────────────────────────────┤\n`;
+        resultText += `│ 📱 *TELEGRAM*                   │\n`;
+        resultText += `│ @TeamRedXhacker1               │\n`;
+        resultText += `└────────────────────────────────┘\n\n`;
         
-        // Your signature
-        resultText += `╭━━━━━━━━━━━━━━━━━━━━╮\n`;
-        resultText += `┃ ✨ *BY: MUZAMIL KHAN* ✨ ┃\n`;
-        resultText += `╰━━━━━━━━━━━━━━━━━━━━╯\n`;
+        resultText += `🎀 *━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━* 🎀\n`;
+        resultText += `   ⚡ *POWERED BY TEAM MUZAMIL* ⚡   \n`;
+        resultText += `🎀 *━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━* 🎀\n\n`;
+        
+        resultText += `✨ *FOR EDUCATION PURPOSE ONLY* ✨\n`;
+        resultText += `💫 *ACCURACY: 99.9% GUARANTEED* 💫`;
 
         await conn.sendMessage(from, {
             text: resultText,
@@ -106,17 +131,17 @@ async (conn, mek, m, { from, quoted, body, args, reply }) => {
                 forwardingScore: 999,
                 isForwarded: true,
                 externalAdReply: {
-                    title: "📱 SIM DATABASE",
-                    body: `Results for +${cleanNumber}`,
-                    thumbnailUrl: "https://i.imgur.com/7jZk9WY.png",
-                    sourceUrl: "https://whatsapp.com",
+                    title: "📱 SIM DATABASE PRO",
+                    body: `✅ ${response.records.length} Record(s) Found`,
+                    thumbnailUrl: "https://res.cloudinary.com/di2a9lenz/image/upload/v1777634329/omegatech_media/d7riz8sz6yq3avzq7vaf.jpg",
+                    sourceUrl: "https://whatsapp.com/channel/0029VbCkm3rAe5VzCYLtNb2u",
                     mediaType: 1
                 }
             }
         }, { quoted: mek });
 
     } catch (e) {
-        console.error("Error in sim command:", e);
-        reply(`❌ Error: ${e.message}\n\nTry again later.`);
+        console.error("Error:", e);
+        reply(`❌ *ERROR*\n\n${e.message}\n\n🔄 Try again later.\n\n📌 Report: @MUZAMIL_KHAN`);
     }
 });
