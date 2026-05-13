@@ -3,8 +3,8 @@ const { cmd } = require("../command");
 
 cmd({
   pattern: "video",
-  alias: ["reels", "shortvideo", "tiktok"],
-  desc: "Search for TikTok videos - Get the LONGEST video only",
+  alias: ["video3", "video1", "video2"],
+  desc: "Search for videos - Get the video only",
   react: '🎬',
   category: 'tools',
   filename: __filename
@@ -22,7 +22,7 @@ cmd({
   await store.react('⏳');
 
   try {
-    reply(`🔎 *Searching TikTok for:* ${query}`);
+    reply(`🔎 *Searching  for:* ${query}`);
     
     const response = await fetch(`https://apis-starlights-team.koyeb.app/starlight/tiktoksearch?text=${encodeURIComponent(query)}`);
     const data = await response.json();
@@ -96,7 +96,7 @@ cmd({
     const author = longestVideo.author || "Unknown Author";
     const username = m.pushName || sender || "User";
     
-    const caption = `🎬 *━━━━━〔 𝙏𝙄𝙆𝙏𝙊𝙆 𝙑𝙄𝘿𝙀𝙊 〕━━━━━* 🎬
+    const caption = `🎬 *━━━━━〔 𝙈𝙐𝙕𝘼𝙈𝙄𝙇-𝙓𝘿 𝙑𝙄𝘿𝙀𝙊 〕━━━━━* 🎬
 
 ┏━━━━━━━━━━━━━━━━━━━━┓
 ┃  📱 *${title}*
@@ -108,7 +108,7 @@ cmd({
 ┃ ⚡ *𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈:* 𝙼𝚄𝚉𝙰𝙼𝙸𝙻-𝚇𝙳
 ┗━━━━━━━━━━━━━━━━━━━━┛
 
-✨ *Longest video from search results* ✨`;
+✨ * video from search results* ✨`;
 
     // Send the longest video
     await conn.sendMessage(from, {

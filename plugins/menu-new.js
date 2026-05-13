@@ -11,11 +11,23 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
     try {
-        const menuCaption = `╭━━━〔 *${config.BOT_NAME}* 〕━━━┈⊷
-┃★╭──────────────────────────
-┃★│ 🌐 Botname : *${config.BOT_NAME}*
-┃★│ 👑 Owner : *${config.OWNER_NAME}*
-┃★╰──────────────────────────
+        const menuCaption = `╭───『 *${config.BOT_NAME}* 』───⳹
+│
+│ *🛠️ BOT INFORMATION*
+│ • 🤖 Bot Name: ${config.BOT_NAME}
+│ • 👑 Owner: ${config.OWNER_NAME}
+│ • ⚙️ Prefix: [${config.PREFIX}]
+│ • 🌐 Platform: Heroku
+│ • 📦 Version: 4.0.0
+│ • 🕒 Runtime: ${runtime(process.uptime())}
+│
+│ *📊 COMMAND STATS*
+│ • 📜 Total Commands: ${totalCommands}
+│ • 🔄 Total Aliases: ${aliasCount}
+│ • 🗂️ Categories: ${categories.length}
+│
+╰────────────────⳹\n
+
 ╰━━━━━━━━━━━━━━━┈⊷
 ╭━━━❪ 📥 𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃 ❫━━━┈⊷
 ┃
