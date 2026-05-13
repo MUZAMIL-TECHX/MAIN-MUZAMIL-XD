@@ -57,7 +57,13 @@ cmd({
         await pipeline(audioResponse.data, fs.createWriteStream(tempFile));
         const audioBuffer = fs.readFileSync(tempFile);
 
-        // Step 4: Send audio with metadata
+        // Step 4: Create formatted description
+        const description = `╭━━━━━━━━━━━━━━━━━━╮\n┃      🎵 Spotify Song 🎵     \n╰━━━━━━━━━━━━━━━━━━╯\n\n\n✭ 𝙎𝙊𝙉𝙂 : ${title}\n✭ 𝙎𝙀𝘼𝙍𝘾𝙃 𝘽𝙔 : ${q}\n✭ 𝘼𝙍𝙏𝙄𝙎𝙏 : ${artist}\n✭ 𝘿𝙊𝙒𝙉𝙇𝙊𝘼𝘿𝙀𝘿 𝘽𝙔 : 𝙈𝙐𝙕𝘼𝙈𝙄𝙇-𝙓𝘿\n\n╭━━━━━━━━━━━━━━━━━━╮\n┃      ✨ Enjoy The Song ✨    \n╰━━━━━━━━━━━━━━━━━━╯\n\n> 🎧 Thanks For Using MUZAMIL-XD Bot 🎧`;
+
+        // Step 5: Send description first
+        await conn.sendMessage(from, { text: description }, { quoted: mek });
+
+        // Step 6: Send audio with metadata
         await conn.sendMessage(from, {
             audio: audioBuffer,
             mimetype: 'audio/mpeg',
