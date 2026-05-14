@@ -547,3 +547,207 @@ cmd({
     reply(`❌ Error: ${error.message}`);
   }
 });
+cmd({
+  pattern: "mareez",
+  alias: ["petiant", "petiant"],
+  desc: "Randomly selects a boy from the group",
+  react: "🙇‍♂️",
+  category: "fun",
+  filename: __filename
+}, async (conn, mek, store, { isGroup, groupMetadata, reply, sender }) => {
+  try {
+    if (!isGroup) return reply("❌ This command can only be used in groups!");
+
+    const participants = groupMetadata.participants;
+    
+    // Filter out bot and get random participant
+    const eligible = participants.filter(p => !p.id.includes(conn.user.id.split('@')[0]));
+    
+    if (eligible.length < 1) return reply("❌ No eligible participants found!");
+
+    const randomUser = eligible[Math.floor(Math.random() * eligible.length)];
+    
+    await conn.sendMessage(
+      mek.chat,
+      { 
+        text: `👦 *Yeh lo mareez 😂* \n\n@${randomUser.id.split('@')[0]} Lagtaa hy isko qabzee ho gayee h😂`, 
+        mentions: [randomUser.id] 
+      },
+      { quoted: mek }
+    );
+
+  } catch (error) {
+    console.error("Error in .bacha command:", error);
+    reply(`❌ Error: ${error.message}`);
+  }
+});
+cmd({
+  pattern: "king",
+  alias: ["badshah", "shehzada"],
+  desc: "Randomly selects a boy from the group",
+  react: "🤴",
+  category: "fun",
+  filename: __filename
+}, async (conn, mek, store, { isGroup, groupMetadata, reply, sender }) => {
+  try {
+    if (!isGroup) return reply("❌ This command can only be used in groups!");
+
+    const participants = groupMetadata.participants;
+    
+    // Filter out bot and get random participant
+    const eligible = participants.filter(p => !p.id.includes(conn.user.id.split('@')[0]));
+    
+    if (eligible.length < 1) return reply("❌ No eligible participants found!");
+
+    const randomUser = eligible[Math.floor(Math.random() * eligible.length)];
+    
+    await conn.sendMessage(
+      mek.chat,
+      { 
+        text: `*Yee Raha Shehzada🫅* \n\n@${randomUser.id.split('@')[0]} Ab Iskee Ranee Dhondho Koie😂`, 
+        mentions: [randomUser.id] 
+      },
+      { quoted: mek }
+    );
+
+  } catch (error) {
+    console.error("Error in .bacha command:", error);
+    reply(`❌ Error: ${error.message}`);
+  }
+});
+cmd({
+  pattern: "shehzadi",
+  alias: ["rane", "queen"],
+  desc: "Randomly selects a boy from the group",
+  react: "🫅",
+  category: "fun",
+  filename: __filename
+}, async (conn, mek, store, { isGroup, groupMetadata, reply, sender }) => {
+  try {
+    if (!isGroup) return reply("❌ This command can only be used in groups!");
+
+    const participants = groupMetadata.participants;
+    
+    // Filter out bot and get random participant
+    const eligible = participants.filter(p => !p.id.includes(conn.user.id.split('@')[0]));
+    
+    if (eligible.length < 1) return reply("❌ No eligible participants found!");
+
+    const randomUser = eligible[Math.floor(Math.random() * eligible.length)];
+    
+    await conn.sendMessage(
+      mek.chat,
+      { 
+        text: `*👸 Yee rahee King ke queen* \n\n@${randomUser.id.split('@')[0]} Cute hy yaar fir aur dikhaio 🫣`, 
+        mentions: [randomUser.id] 
+      },
+      { quoted: mek }
+    );
+
+  } catch (error) {
+    console.error("Error in .bacha command:", error);
+    reply(`❌ Error: ${error.message}`);
+  }
+});
+cmd({
+  pattern: "hotgril",
+  alias: ["sexygril", "sexybachi"],
+  desc: "Randomly selects a boy from the group",
+  react: "🥵",
+  category: "fun",
+  filename: __filename
+}, async (conn, mek, store, { isGroup, groupMetadata, reply, sender }) => {
+  try {
+    if (!isGroup) return reply("❌ This command can only be used in groups!");
+
+    const participants = groupMetadata.participants;
+    
+    // Filter out bot and get random participant
+    const eligible = participants.filter(p => !p.id.includes(conn.user.id.split('@')[0]));
+    
+    if (eligible.length < 1) return reply("❌ No eligible participants found!");
+
+    const randomUser = eligible[Math.floor(Math.random() * eligible.length)];
+    
+    await conn.sendMessage(
+      mek.chat,
+      { 
+        text: `*Yeee rahee hottest Gril 🫣* \n\n@${randomUser.id.split('@')[0]} 😂😂Pochho isee hot hy ya nhi?`, 
+        mentions: [randomUser.id] 
+      },
+      { quoted: mek }
+    );
+
+  } catch (error) {
+    console.error("Error in .bacha command:", error);
+    reply(`❌ Error: ${error.message}`);
+  }
+});
+cmd({
+  pattern: "hotboy",
+  alias: ["sexyboy", "sexybacha"],
+  desc: "Randomly selects a boy from the group",
+  react: "👦",
+  category: "fun",
+  filename: __filename
+}, async (conn, mek, store, { isGroup, groupMetadata, reply, sender }) => {
+  try {
+    if (!isGroup) return reply("❌ This command can only be used in groups!");
+
+    const participants = groupMetadata.participants;
+    
+    // Filter out bot and get random participant
+    const eligible = participants.filter(p => !p.id.includes(conn.user.id.split('@')[0]));
+    
+    if (eligible.length < 1) return reply("❌ No eligible participants found!");
+
+    const randomUser = eligible[Math.floor(Math.random() * eligible.length)];
+    
+    await conn.sendMessage(
+      mek.chat,
+      { 
+        text: `👦 *Yee lo sexy Boy 😂* \n\n@${randomUser.id.split('@')[0]} Ab apkee marzee hy isko sex kro yaa isy sex krwaio😂`, 
+        mentions: [randomUser.id] 
+      },
+      { quoted: mek }
+    );
+
+  } catch (error) {
+    console.error("Error in .bacha command:", error);
+    reply(`❌ Error: ${error.message}`);
+  }
+});
+cmd({
+  pattern: "pagal",
+  alias: ["mental", "beaqal"],
+  desc: "Randomly selects a boy from the group",
+  react: "💩",
+  category: "fun",
+  filename: __filename
+}, async (conn, mek, store, { isGroup, groupMetadata, reply, sender }) => {
+  try {
+    if (!isGroup) return reply("❌ This command can only be used in groups!");
+
+    const participants = groupMetadata.participants;
+    
+    // Filter out bot and get random participant
+    const eligible = participants.filter(p => !p.id.includes(conn.user.id.split('@')[0]));
+    
+    if (eligible.length < 1) return reply("❌ No eligible participants found!");
+
+    const randomUser = eligible[Math.floor(Math.random() * eligible.length)];
+    
+    await conn.sendMessage(
+      mek.chat,
+      { 
+        text: `*Yee raha Mentaal case 😢* \n\n@${randomUser.id.split('@')[0]} `, 
+        mentions: [randomUser.id] 
+      },
+      { quoted: mek }
+    );
+
+  } catch (error) {
+    console.error("Error in .bacha command:", error);
+    reply(`❌ Error: ${error.message}`);
+  }
+});

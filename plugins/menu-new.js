@@ -30,9 +30,10 @@ cmd({
 ┃ ✧ 🌐 ytsearch <videoname>
 ┃ ✧ 🎬 ytvideo <link>
 ┃ ✧ 🎬 video <link>
-┃ ✧ 🎙songplay <link/name>
-┃ ✧ 🎙playsong <link/name>
-┃ ✧ 🎙splay <link/name>
+┃ ✧ 🎙song <name>
+┃ ✧ 🎙play <name>
+┃ ✧ 🎙gana <name>
+┃ ✧ 🎙music <lname>
 ┃ ✧ 📱 apk <name>
 ┃ ✧ 📱 apk2
 ┃ ✧ 💾 mfire
@@ -176,8 +177,31 @@ cmd({
 ┃ ✧ 👧 bachi
 ┃ ✧ 👦 larka
 ┃ ✧ 👦 bacha
+┃ ✧ 👴 uncle
+┃ ✧ 🧓 chacha
+┃ ✧ 🧓 chachi
+┃ ✧ 👩‍🦰 wife
+┃ ✧ 👨‍🦰 husband
+┃ ✧ 👩‍🦱 gf
+┃ ✧ 👱‍♂️ bf
+┃ ✧ 🙎 sister
+┃ ✧ 🙎‍♂️ brother
+┃ ✧ 🙆‍♀️ mother
+┃ ✧ 🙆‍♂️ father
+┃ ✧ 💁‍♀️ crush
+┃ ✧ 🙇‍♀️ gareeb
+┃ ✧ 🙇‍♂️ ameer
+┃ ✧ 🤷 faqeer
 ┃ ✧ 💍 marige
 ┃ ✧ 🚶 nikal
+┃ ✧ 😫 mareez
+┃ ✧ 🤴 king
+┃ ✧ 🫅 queen
+┃ ✧ 👸 shehzadi
+┃ ✧ 👸 shehzada
+┃ ✧ 🥵 hotboy
+┃ ✧ 🥵 hotgril
+┃ ✧ 💩 pagal
 ┃ ✧ 😕 confused
 ┃ ✧ 🌙 moon
 ┃ ✧ 😊 shy
